@@ -1,0 +1,83 @@
+:root {
+    --bg-base: #050505;
+    --panel-bg: #111111;
+    --text-primary: #e0e0e0;
+    --text-muted: #666666;
+    --accent-cyan: #00e5ff;
+    --accent-magenta: #ff007f;
+    --grid-color: rgba(255, 255, 255, 0.03);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Courier New', Courier, monospace; /* Monospace for technical feel */
+    overflow: hidden;
+}
+
+/* Dynamic background grid to simulate a mathematical workspace */
+body {
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+#ui-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+header {
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: normal;
+    text-shadow: 0 0 10px var(--accent-cyan);
+}
+
+.subtitle {
+    margin: 5px 0 0 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+#graph-container {
+    flex-grow: 1;
+    background-color: var(--panel-bg);
+    border: 1px solid #333;
+    border-radius: 4px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+    position: relative;
+    overflow: hidden;
+}
+
+/* D3 SVG Element Styling */
+.node circle {
+    stroke: var(--bg-base);
+    stroke-width: 1.5px;
+}
+
+.node text {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    fill: var(--text-primary);
+    pointer-events: none;
+}
+
+.link {
+    stroke: var(--text-muted);
+    stroke-opacity: 0.6;
+}

@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="UltraMassive.ML - AI Architecture for All & Autotelic Architecture" name="description">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UltraMassive.ML | Enterprise NOC & Portal</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- KaTeX & MathJax for Live Mathematical Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: {'[+]': ['color']}
+            },
+            loader: {load: ['[tex]/color']}
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace', 'Fira Code'],
+                    },
+                    colors: {
+                        um: {
+                            bg: '#010308',     
+                            panel: '#050B14',  
+                            border: '#1A2744', 
+                            nano: '#10b981', 
+                            standard: '#3b82f6', 
+                            frontier: '#8b5cf6',
+                            redact: '#ef4444',
+                            accent: '#0ea5e9'  
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'scanline': 'scanline 8s linear infinite',
+                        'glow-pulse': 'glowPulse 3s infinite alternate',
+                    },
+                    keyframes: {
+                        scanline: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' }
+                        },
+                        glowPulse: {
+                            '0%': { boxShadow: '0 0 10px rgba(14, 165, 233, 0.05)' },
+                            '100%': { boxShadow: '0 0 25px rgba(14, 165, 233, 0.2)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root { --bg:#04070f; --panel:#0b1424; --card:#13203a; --card-border:#25324d; --ink:#e2e8f0; --accent:#3B82F6; --accent-2:#60A5FA; }
+        html { scroll-behavior:smooth; scroll-padding-top:7rem; }
+        body { font-family:'Inter',sans-serif; background-color:var(--bg); color:var(--ink); line-height:1.7; overflow-x:hidden;}
+        
+        .header-bg { background-color:rgba(6,13,26,0.85); backdrop-filter:blur(10px); border-bottom:1px solid #182238; }
+        .accent-blue { color:var(--accent); }
+        .panel-bg { background-color:var(--panel); }
+        .nav-link { transition:color .3s ease, background-color .3s ease; padding:.5rem 1rem; border-radius:.375rem; }
+        .nav-link:hover, .nav-link.active { color:var(--accent-2); background-color:rgba(59,130,246,.12); }
+        .section-heading { border-bottom:2px solid var(--accent); padding-bottom:.75rem; margin-bottom:2.5rem; display:inline-block; color:#f1f5f9; }
+        .sub-section-heading { color:var(--accent); font-size:1.875rem; font-weight:700; margin-bottom:1.5rem; padding-top:1rem; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:theme('colors.um.bg'); }
+        ::-webkit-scrollbar-thumb { background:theme('colors.slate.800'); border-radius:3px; }
+        ::-webkit-scrollbar-thumb:hover { background:theme('colors.slate.600'); }
+        
+        .card { background-color:var(--card); border:1px solid var(--card-border); border-radius:.75rem; box-shadow:0 6px 18px rgba(0,0,0,.45); transition:transform .3s ease, border-color .3s ease, box-shadow .3s ease; }
+        .card:hover { transform:translateY(-6px); border-color:var(--accent); box-shadow:0 10px 28px rgba(59,130,246,.18); }
+        .btn-primary { background-color:var(--accent); color:#fff; padding:1rem 2.5rem; border-radius:9999px; font-weight:bold; transition:background-color .3s ease, transform .3s ease; box-shadow:0 6px 16px rgba(59,130,246,.35); }
+        .btn-primary:hover { background-color:#2563EB; transform:scale(1.05); }
+        .glow { text-shadow:0 0 26px rgba(59,130,246,.45); }
+        .reveal { opacity:0; transform:translateY(24px); transition:opacity .7s ease, transform .7s ease; }
+        .reveal.in { opacity:1; transform:none; }
+        .stat-num { font-variant-numeric:tabular-nums; }
+
+        .glass-panel { background: rgba(5, 11, 20, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid theme('colors.um.border'); position: relative; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        .glass-panel::before, .glass-panel::after { content: ''; position: absolute; width: 8px; height: 8px; border: 1px solid theme('colors.slate.600'); pointer-events: none; transition: all 0.3s; }
+        .glass-panel::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+        .glass-panel::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+        .glass-panel:hover::before, .glass-panel:hover::after { border-color: theme('colors.um.accent'); }
+        
+        .noc-grid-bg { 
+            background-image: 
+                radial-gradient(rgba(14, 165, 233, 0.1) 1px, transparent 1px),
+                radial-gradient(rgba(14, 165, 233, 0.03) 1px, transparent 1px); 
+            background-size: 20px 20px, 100px 100px; 
+            background-position: 0 0, 10px 10px;
+        }
+        
+        .scan-container { position: relative; overflow: hidden; }
+        .scan-container::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 100%; background: linear-gradient(to bottom, transparent, rgba(14, 165, 233, 0.08), transparent); animation: scanline 4s linear infinite; pointer-events: none; z-index: 50; }
+        
+        .term-block { opacity: 0; transform: translateY(10px); animation: fadeUp 0.4s forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        .katex-display { margin: 0.5em 0 !important; font-size: 1.1em; color: #e2e8f0; overflow-x: auto; overflow-y: hidden; }
+        
+        .toggle-checkbox:checked { right: 0; border-color: #0ea5e9; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #0ea5e9; }
+
+        @keyframes flowData { 0% { stroke-dashoffset: 200; } 100% { stroke-dashoffset: 0; } }
+        .data-flow-line { stroke-dasharray: 10, 5; animation: flowData 3s linear infinite; }
+
+        .chart-glow { filter: drop-shadow(0px 0px 4px rgba(14, 165, 233, 0.6)); }
+        .chart-glow-magenta { filter: drop-shadow(0px 0px 4px rgba(217, 70, 239, 0.6)); }
+        .chart-glow-green { filter: drop-shadow(0px 0px 4px rgba(16, 185, 129, 0.6)); }
+        .chart-glow-amber { filter: drop-shadow(0px 0px 4px rgba(245, 158, 11, 0.6)); }
+        
+        @keyframes spookyFade {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.85); filter: blur(12px); }
+            45% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); filter: blur(8px); }
+            65% { opacity: 0.08; transform: translate(-50%, -50%) scale(1.05); filter: blur(4px); }
+            85% { opacity: 0; transform: translate(-50%, -50%) scale(1.1); filter: blur(10px); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.15); filter: blur(15px); }
+        }
+        .spooky-face {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 0; color: #0ea5e9;
+            animation: spookyFade 22s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(12px, 1fr)); gap: 2px; justify-content: center; }
+        .hex-node { width: 12px; height: 12px; background: #0b1424; border: 1px solid #1a2744; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 2px; }
+        .hex-node.active-nano { background: rgba(16, 185, 129, 0.6); border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.6); }
+        .hex-node.active-std { background: rgba(14, 165, 233, 0.6); border-color: #0ea5e9; box-shadow: 0 0 10px rgba(14, 165, 233, 0.6); }
+        .hex-node.active-front { background: rgba(139, 92, 246, 0.6); border-color: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.6); }
+        
+        .radar-sweep { animation: sweep 3s linear infinite; transform-origin: bottom left; }
+        @keyframes sweep { to { transform: rotate(360deg); } }
+        
+        path { transition: d 0.1s linear; }
+    </style>
+</head>
+<body class="text-gray-100 selection:bg-blue-500/30">
+
+    <header class="header-bg shadow-lg fixed w-full z-[100]">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#hero" class="flex items-center gap-3 group">
+                <span class="inline-flex w-10 h-10 rounded-lg bg-[#04070f] items-center justify-center ring-1 ring-blue-500/30 shrink-0"><svg class="w-7 h-7" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gcH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><polygon points="24.42,23.28 24.42,10.23 35.67,16.80" fill="url(#gcH)"/><polygon points="24.83,24.00 36.08,17.52 36.08,30.48" fill="#60a5fa"/><polygon points="24.42,24.72 35.67,31.20 24.42,37.77" fill="#93c5fd"/><polygon points="23.58,24.72 23.58,37.77 12.33,31.20" fill="#1d4ed8"/><polygon points="23.17,24.00 11.92,30.48 11.92,17.52" fill="#3b82f6"/><polygon points="23.58,23.28 12.33,16.80 23.58,10.23" fill="url(#gcH)"/><path d="M11.5 16.8 L24 9.5 L36.5 16.8" fill="none" stroke="#fff" stroke-width="0.8" opacity=".5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                <span class="text-2xl font-extrabold text-gray-100 group-hover:text-blue-300 transition tracking-wide">UltraMassive.ML</span>
+            </a>
+            <button onclick="toggleMenu()" class="md:hidden text-gray-200 p-2" aria-label="Toggle menu">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div id="navlinks" class="hidden md:flex flex-col md:flex-row absolute md:static top-full left-0 w-full md:w-auto header-bg md:bg-transparent px-6 md:px-0 py-4 md:py-0 gap-1 md:gap-x-1 border-b border-[#182238] md:border-0">
+                <a href="#hero" class="nav-link text-sm lg:text-base font-medium text-gray-200">Home</a>
+                <a href="#mission" class="nav-link text-sm lg:text-base font-medium text-gray-200">Mission</a>
+                <a href="#autotelic" class="nav-link text-sm lg:text-base font-medium text-gray-200">Autotelic Engine</a>
+                <a href="#pricing" class="nav-link text-sm lg:text-base font-medium text-gray-200">API Access</a>
+                <a href="#noc" class="nav-link text-sm lg:text-base font-medium text-red-400 font-bold border border-red-500/30 bg-red-900/10" onclick="setTimeout(() => document.getElementById('noc-key').focus(), 100);">NOC Console <svg class="inline w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="pt-24 pb-12">
+        <section id="hero" class="relative bg-gradient-to-br from-[#0a1322] to-[#0b2244] text-gray-100 py-20 md:py-32 flex items-center justify-center text-center overflow-hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250" class="spooky-face w-[24rem] h-[32rem] md:w-[40rem] md:h-[50rem]">
+                <ellipse cx="60" cy="100" rx="12" ry="25" fill="currentColor"/>
+                <ellipse cx="140" cy="100" rx="12" ry="25" fill="currentColor"/>
+                <polygon points="100,130 92,155 108,155" fill="currentColor"/>
+                <path d="M 40 180 Q 100 210 160 180 Q 100 195 40 180" stroke="currentColor" stroke-width="4" fill="none"/>
+                <path d="M 100 15 C 30 15 10 100 35 160 C 50 195 75 235 100 235 C 125 235 150 195 165 160 C 190 100 170 15 100 15 Z" stroke="currentColor" stroke-width="2" fill="none" opacity="0.4"/>
+            </svg>
+            
+            <div id="math-bg-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <img src="https://placehold.co/600x110/0b1424/60a5fa?text=AI+Architecture+for+All&font_size=34" alt="AI Architecture for All" class="mx-auto mb-8 w-64 h-auto max-w-full rounded-lg shadow-xl border-4 border-blue-500">
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 leading-tight text-gray-100 glow tracking-tight">UltraMassive.ML</h1>
+                <p class="text-3xl md:text-4xl font-bold mb-10 mt-6 text-gray-400" style="text-shadow: -1px -1px 0 #ef4444, 1px -1px 0 #ef4444, -1px 1px 0 #ef4444, 1px 1px 0 #ef4444;">
+                    Integrity Matters
+                </p>
+                <p class="max-w-4xl mx-auto text-lg md:text-xl leading-relaxed text-gray-300">
+                    At UltraMassive.ML, our mission is to redefine the boundaries of computational intelligence, ensuring that emerging autotelic architectures serve the enterprise in the most deterministic, impactful, and scalable ways. We seamlessly span the ecosystem—from Open-Source HuggingFace models to Closed-API monoliths.
+                </p>
+                <a href="#pricing" class="btn-primary mt-12 inline-block shadow-[0_0_20px_rgba(59,130,246,0.5)]">Request API Access</a>
+            </div>
+        </section>
+
+        <!-- Our Mission Section -->
+        <section id="mission" class="container mx-auto px-6 py-16 mb-12 panel-bg rounded-lg shadow-xl mt-12">
+            <h2 class="text-4xl font-extrabold text-gray-100 section-heading">Our Core Principles & Commitments</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
+                <div class="card p-8">
+                    <h3 class="sub-section-heading">Agnostic Model Topology</h3>
+                    <p class="text-gray-300">We prevent vendor lock-in. Our engine dynamically evaluates payloads and executes against the optimal target—be it OpenAI, Anthropic, Gemini, Meta Llama, Mistral, or localized HuggingFace GGUFs.</p>
+                </div>
+                <div class="card p-8">
+                    <h3 class="sub-section-heading">Deterministic Integrity</h3>
+                    <p class="text-gray-300">Innovation without control risks cascading hallucinations. We integrate strict mathematical guardrails, ensuring possibilistic logic and semantic drift mitigation in every transaction.</p>
+                </div>
+                <div class="card p-8">
+                    <h3 class="sub-section-heading">Creating Financial Arbitrage</h3>
+                    <p class="text-gray-300">Our routing architectures act as real-time Tokenomics engines, redirecting workloads to the most cost-efficient open or closed source models dynamically without sacrificing output quality.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Autotelic Routing Engine Section -->
+        <section id="autotelic" class="container mx-auto px-6 py-16 mb-12 panel-bg rounded-lg shadow-xl">
+            <div class="flex items-center gap-4 mb-4">
+                <span class="inline-flex w-14 h-14 rounded-xl bg-[#0A192F] items-center justify-center ring-1 ring-blue-500/40 shadow-lg shrink-0">
+                    <svg class="w-10 h-10" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gcS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34d399"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><polygon points="24.42,23.28 24.42,10.23 35.67,16.80" fill="url(#gcS)"/><polygon points="24.83,24.00 36.08,17.52 36.08,30.48" fill="#60a5fa"/><polygon points="24.42,24.72 35.67,31.20 24.42,37.77" fill="#93c5fd"/><polygon points="23.58,24.72 23.58,37.77 12.33,31.20" fill="#1d4ed8"/><polygon points="23.17,24.00 11.92,30.48 11.92,17.52" fill="#3b82f6"/><polygon points="23.58,23.28 12.33,16.80 23.58,10.23" fill="url(#gcS)"/><path d="M11.5 16.8 L24 9.5 L36.5 16.8" fill="none" stroke="#fff" stroke-width="0.8" opacity=".5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <div>
+                    <span class="text-sm uppercase tracking-widest font-semibold accent-blue">Autosymbotic &mdash; Powered by UltraMassive.ML</span>
+                    <h2 class="text-4xl font-extrabold text-gray-100 mt-1">The Autotelic Routing Engine</h2>
+                </div>
+            </div>
+            <p class="text-lg mb-10 text-gray-300 max-w-4xl">UltraMassive's Autotelic Routing Engine is a relational, possibility-calibrated LLM router. For every request it builds a small hypergraph of task features and routes to the cheapest open/closed model whose <span class="accent-blue font-semibold">possibility of success</span> clears a confidence floor &mdash; turning model selection into an explainable, budget-paced decision spanning the entire HuggingFace and commercial ecosystem.</p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 reveal">
+                <div class="rounded-xl border border-[#25324d] bg-[#0a1322] p-5 text-center"><div class="text-3xl font-extrabold text-white stat-num"><span data-count="40" data-suffix=" ms">0</span></div><div class="text-xs uppercase tracking-wider text-slate-400 mt-1">routing overhead</div></div>
+                <div class="rounded-xl border border-[#25324d] bg-[#0a1322] p-5 text-center"><div class="text-3xl font-extrabold text-white stat-num"><span data-count="63" data-suffix="%">0</span></div><div class="text-xs uppercase tracking-wider text-slate-400 mt-1">requests downshifted</div></div>
+                <div class="rounded-xl border border-[#25324d] bg-[#0a1322] p-5 text-center"><div class="text-3xl font-extrabold text-white stat-num"><span data-count="55" data-suffix="%">0</span></div><div class="text-xs uppercase tracking-wider text-slate-400 mt-1">avg cost reduction</div></div>
+                <div class="rounded-xl border border-[#25324d] bg-[#0a1322] p-5 text-center"><div class="text-3xl font-extrabold text-white">40+</div><div class="text-xs uppercase tracking-wider text-slate-400 mt-1">ecosystem integrations</div></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 reveal">
+              <div class="card p-6">
+                <h3 class="text-2xl font-bold accent-blue mb-4">Estimate your savings</h3>
+                <div class="space-y-3 text-sm">
+                  <label class="block text-slate-300">Monthly tokens (millions)<input id="roi-tokens" type="number" min="0" value="120" oninput="calcROI()" class="mt-1 w-full px-3 py-2 rounded-md bg-[#0a1322] border border-[#25324d] text-gray-100"></label>
+                  <label class="block text-slate-300">Current blended $/1k tokens<input id="roi-rate" type="number" min="0" step="0.001" value="0.030" oninput="calcROI()" class="mt-1 w-full px-3 py-2 rounded-md bg-[#0a1322] border border-[#25324d] text-gray-100"></label>
+                  <label class="block text-slate-300">Routing aggressiveness <span id="roi-aggr-val" class="accent-blue font-mono float-right">60%</span><input id="roi-aggr" type="range" min="0" max="100" value="60" oninput="roiAggr(this.value)" class="mt-1 w-full accent-blue"></label>
+                </div>
+                <div id="roi-out"></div>
+              </div>
+              <div class="card p-6 flex flex-col h-full">
+                <h3 class="text-2xl font-bold accent-blue mb-4">Talk to the Solutions Architect</h3>
+                <div id="ar-chat-log" class="space-y-3 mb-4 flex-grow max-h-64 overflow-y-auto p-3 border border-[#25324d] rounded bg-[#050B14] shadow-inner font-mono text-sm leading-relaxed text-cyan-50"></div>
+                <div class="flex gap-2 shrink-0">
+                  <input id="ar-chat-input" type="text" onkeydown="if(event.key==='Enter')arSendChat()" class="flex-grow px-4 py-3 rounded-md bg-[#0a1322] border border-[#25324d] focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-gray-100 text-sm font-mono shadow-inner transition-colors" placeholder="Ask about Llama-3 vs Claude routing...">
+                  <button id="ar-chat-btn" onclick="arSendChat()" class="bg-cyan-600 hover:bg-cyan-500 text-[#010308] font-bold px-6 py-2 rounded transition-colors font-mono">SEND</button>
+                </div>
+              </div>
+            </div>
+        </section>
+
+        <!-- Pricing & Subscription Section -->
+        <section id="pricing" class="container mx-auto px-6 py-16 mb-12">
+            <div class="flex flex-col items-center justify-center text-center mb-12">
+                <span class="text-sm text-red-400 font-bold font-mono tracking-widest uppercase block mb-2">ULTRAMASSIVE.ML &middot; FRONTIER</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-4">Enterprise NOC Console</h2>
+                <span class="px-3 py-1 bg-red-900/30 text-red-400 border border-red-500/50 rounded uppercase text-xs tracking-widest font-mono font-bold inline-block mb-6">SUBSCRIPTION REQUIRED</span>
+                <p class="text-lg text-slate-400 max-w-3xl">A live network-operations console for the Autotelic Routing Engine — deterministic routing, possibilistic logic, concept-drift telemetry, FinOps tokenomics, and a hardware/SYS_PERF deck. Gated to active subscribers.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+                <div class="bg-[#050B14] border border-[#1a2744] rounded-lg p-6 flex flex-col hover:border-emerald-500/50 transition-colors relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 px-3 py-1 bg-emerald-900/30 text-emerald-400 text-[10px] font-mono font-bold rounded-bl-lg border-b border-l border-emerald-500/30">FREE</div>
+                    <h3 class="text-xs font-mono font-bold text-emerald-500 uppercase tracking-widest mb-4">DEVELOPER</h3>
+                    <div class="text-4xl font-extrabold text-white mb-6">$0</div>
+                    <ul class="space-y-3 mb-8 flex-1 text-sm text-slate-400 font-mono">
+                        <li>&middot; Routing NOC (basic)</li>
+                        <li>&middot; Live header telemetry</li>
+                        <li>&middot; Drift & SYS_PERF locked</li>
+                        <li>&middot; OSS Model Registry Support</li>
+                    </ul>
+                    <button class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded transition-colors font-mono text-sm">MOUNT BASIC</button>
+                </div>
+
+                <div class="bg-[#050B14] border border-[#1a2744] rounded-lg p-6 flex flex-col hover:border-slate-500 transition-colors">
+                    <h3 class="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">STANDARD</h3>
+                    <div class="text-4xl font-extrabold text-white mb-6">$99<span class="text-lg font-normal text-slate-500">/mo</span></div>
+                    <ul class="space-y-3 mb-8 flex-1 text-sm text-slate-400 font-mono">
+                        <li>&middot; Full Routing NOC</li>
+                        <li>&middot; Drift telemetry</li>
+                        <li>&middot; 5M tokens/day</li>
+                        <li>&middot; Proprietary API Support</li>
+                    </ul>
+                    <button class="w-full bg-transparent border border-cyan-500 text-cyan-400 hover:bg-cyan-900/30 font-bold py-3 rounded transition-colors font-mono text-sm">SUBSCRIBE</button>
+                </div>
+
+                <div class="bg-[#050B14] border border-cyan-500/50 rounded-lg p-6 flex flex-col relative overflow-hidden shadow-[0_0_25px_rgba(14,165,233,0.1)]">
+                    <div class="absolute top-0 inset-x-0 h-1 bg-cyan-500"></div>
+                    <div class="absolute top-0 right-1/2 translate-x-1/2 px-3 py-0.5 bg-cyan-500 text-[#010308] text-[9px] font-mono font-bold rounded-b-md">POPULAR</div>
+                    <h3 class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest mb-4 mt-2">FRONTIER</h3>
+                    <div class="text-4xl font-extrabold text-white mb-6">$499<span class="text-lg font-normal text-slate-500">/mo</span></div>
+                    <ul class="space-y-3 mb-8 flex-1 text-sm text-slate-300 font-mono">
+                        <li>&middot; Everything in Standard</li>
+                        <li>&middot; SYS_PERF + FinOps deck</li>
+                        <li>&middot; Priority routing</li>
+                    </ul>
+                    <button class="w-full bg-cyan-500 hover:bg-cyan-400 text-[#010308] font-bold py-3 rounded transition-colors font-mono text-sm shadow-[0_0_15px_rgba(14,165,233,0.4)]">SUBSCRIBE</button>
+                </div>
+
+                <div class="bg-[#050B14] border border-[#1a2744] rounded-lg p-6 flex flex-col hover:border-slate-500 transition-colors">
+                    <h3 class="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest mb-4">ENTERPRISE</h3>
+                    <div class="text-4xl font-extrabold text-white mb-6">Custom</div>
+                    <ul class="space-y-3 mb-8 flex-1 text-sm text-slate-400 font-mono">
+                        <li>&middot; SSO + dedicated nodes</li>
+                        <li>&middot; On-prem CPS sharding</li>
+                        <li>&middot; Self-Hosted / vLLM Integrations</li>
+                    </ul>
+                    <button class="w-full bg-[#010308] hover:bg-[#1a2744] text-white border border-[#1a2744] font-bold py-3 rounded transition-colors font-mono text-sm">START TRIAL</button>
+                </div>
+            </div>
+
+            <!-- AI Sales / Deployment Architect -->
+            <div class="mt-8 mb-8 bg-[#050B14] border border-cyan-900/50 rounded-lg p-8 shadow-[0_0_30px_rgba(14,165,233,0.05)]">
+                <h4 class="text-lg font-bold text-gray-100 mb-2 flex items-center gap-2">✨ AI Deployment Architect</h4>
+                <p class="text-sm text-slate-400 mb-6">Unsure which tier fits your infrastructure? Describe your scale, security needs, and token volume to get an instant AI-architected recommendation.</p>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <textarea id="architect-input" rows="2" class="flex-grow bg-[#010308] border border-[#1a2744] rounded p-3 text-slate-200 text-sm focus:outline-none focus:border-cyan-500 font-mono shadow-inner resize-none transition-colors" placeholder="e.g., 'We process 50M tokens/day of PHI medical logs, need on-prem HuggingFace Llama-3 sharding and strict HIPAA compliance...'"></textarea>
+                    <button id="btn-architect" onclick="architectDeployment()" class="bg-cyan-600 hover:bg-cyan-500 text-[#010308] font-bold px-8 py-3 rounded transition-colors font-mono whitespace-nowrap shadow-[0_0_15px_rgba(14,165,233,0.4)] flex items-center justify-center text-center leading-tight">ARCHITECT<br>SOLUTION</button>
+                </div>
+                <div id="architect-output" class="hidden mt-6 p-6 bg-[#010308] border border-cyan-900/50 rounded text-sm font-mono text-cyan-100 leading-relaxed shadow-inner"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+                <!-- License Key Panel -->
+                <div class="bg-[#050B14] border border-[#1a2744] rounded-lg p-8">
+                    <h4 class="text-sm font-bold text-slate-200 uppercase tracking-widest font-mono mb-2">HAVE A LICENSE KEY?</h4>
+                    <p class="text-sm text-slate-500 mb-6">Mount the full console with an Enterprise or Executive credential.</p>
+                    <div class="flex gap-3 mb-4">
+                        <input type="password" id="noc-key" class="flex-grow px-4 py-3 rounded bg-[#010308] border border-[#1a2744] focus:outline-none focus:border-cyan-500 text-gray-100 font-mono text-sm shadow-inner transition-colors" placeholder="Enter Enterprise Key...">
+                        <button onclick="unlockNOC()" class="bg-cyan-500 hover:bg-cyan-400 text-[#010308] font-bold px-6 py-3 rounded transition-colors font-mono text-sm">MOUNT</button>
+                    </div>
+                    <p id="noc-error" class="text-red-400 text-xs hidden animate-pulse font-mono mb-2">ERR_UNAUTHORIZED: Invalid access token.</p>
+                    <p class="text-[10px] text-slate-600 font-mono">Tip: <span class="text-slate-400">UM-ADMIN</span> mounts full console.</p>
+                </div>
+
+                <!-- API Access Panel -->
+                <div class="bg-[#050B14] border border-[#1a2744] rounded-lg p-8">
+                    <h4 class="text-sm font-bold text-slate-200 uppercase tracking-widest font-mono mb-2 flex items-center gap-2">
+                        REQUEST API ACCESS <span class="text-emerald-500 text-[10px]">(FREE FOR DEVS)</span>
+                    </h4>
+                    <p class="text-sm text-slate-500 mb-6">Get a developer key for the routing API and the basic NOC.</p>
+                    <form class="space-y-4" onsubmit="event.preventDefault(); alert('API Request submitted! Our team will review your application.'); this.reset();">
+                        <input type="email" class="w-full px-4 py-3 rounded bg-[#010308] border border-[#1a2744] focus:outline-none focus:border-emerald-500 text-gray-100 font-mono text-sm shadow-inner transition-colors" placeholder="you@company.com" required>
+                        <select class="w-full px-4 py-3 rounded bg-[#010308] border border-[#1a2744] focus:outline-none focus:border-emerald-500 text-gray-100 font-mono text-sm shadow-inner transition-colors appearance-none cursor-pointer">
+                            <option>Prototype / evaluation</option>
+                            <option>Production deployment</option>
+                            <option>Academic research</option>
+                        </select>
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded transition-colors font-mono text-sm shadow-[0_0_15px_rgba(16,185,129,0.3)]">REQUEST DEVELOPER KEY</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main NOC Container (Hidden initially, shown by MOUNT) -->
+        <div id="noc-app-wrapper" class="fixed inset-0 z-[200] hidden bg-um-bg">
+            <div id="noc-app" class="w-full h-full flex flex-col text-sm transition-all duration-700 opacity-20 pointer-events-none">
+                
+                <header class="glass-panel min-h-[4rem] flex flex-col md:flex-row items-start md:items-center justify-between px-6 py-2 shrink-0 z-30 rounded-none border-t-0 border-l-0 border-r-0 border-b-cyan-900/50 bg-[#050b14] gap-4">
+                    <div class="flex items-center gap-6 w-full md:w-auto">
+                        <div class="w-8 h-8 rounded bg-[#010308] border border-cyan-500/50 flex items-center justify-center shadow-[0_0_10px_rgba(14,165,233,0.3)] shrink-0">
+                            <svg class="w-4 h-4 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <div>
+                            <h1 class="text-slate-100 font-bold tracking-wide uppercase leading-tight">UltraMassive.ML</h1>
+                            <p class="text-[10px] text-cyan-500 font-mono tracking-widest uppercase">Global NOC v4.3</p>
+                        </div>
+                    </div>
+                    
+                    <!-- View Toggles (Flex Wrap for many tabs) -->
+                    <div class="flex flex-wrap items-center justify-start md:justify-end gap-1.5 w-full md:w-auto">
+                        <button onclick="switchView('routing')" id="tab-routing" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded bg-cyan-900/30 text-cyan-400 transition-colors border border-cyan-500/30">ROUTING</button>
+                        <button onclick="switchView('data-eng')" id="tab-data-eng" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">DATA_ENG</button>
+                        <button onclick="switchView('data-sci')" id="tab-data-sci" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">DATA_SCI</button>
+                        <button onclick="switchView('ml-eng')" id="tab-ml-eng" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">ML_ENG</button>
+                        <button onclick="switchView('ai-eng')" id="tab-ai-eng" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">AI_ENG</button>
+                        <button onclick="switchView('drift')" id="tab-drift" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">DRIFT_SEC</button>
+                        <button onclick="switchView('arch')" id="tab-arch" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">TOPOLOGY</button>
+                        <button onclick="switchView('perf')" id="tab-perf" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">SYS_PERF</button>
+                        <button onclick="switchView('sre')" id="tab-sre" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-slate-500 hover:text-slate-300 transition-colors border border-transparent">SRE_COPILOT ✨</button>
+                        <button onclick="closeNOC()" class="px-3 py-1 text-[9px] font-mono font-bold tracking-widest uppercase rounded text-red-500 hover:text-red-400 transition-colors ml-2 border border-red-900/50 bg-red-900/10">EXIT</button>
+                    </div>
+                </header>
+
+                <div class="flex-1 flex overflow-hidden noc-grid-bg relative">
+                    
+                    <!-- VIEW 1: ROUTING NOC -->
+                    <div id="view-routing" class="w-full h-full flex flex-col md:flex-row absolute inset-0 transition-opacity duration-300 overflow-y-auto md:overflow-hidden">
+                        <aside class="w-full md:w-1/3 lg:w-[400px] glass-panel border-r border-t-0 border-b-0 flex flex-col z-10 bg-[#050b14]/95 backdrop-blur-md">
+                            <div class="p-5 border-b border-[#1a2744]">
+                                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-between">
+                                    <span>Inference Payload</span>
+                                    <span class="px-2 py-0.5 rounded text-[9px] bg-[#010308] border border-[#1a2744] text-cyan-400 font-mono shadow-[0_0_8px_rgba(14,165,233,0.2)]">LIVE_EVAL</span>
+                                </h2>
+                                <textarea id="prompt-input" rows="4" class="w-full bg-[#010308] border border-[#1a2744] rounded p-3 text-slate-200 text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 resize-none font-mono placeholder:text-slate-700 transition-colors shadow-inner" placeholder="Enter an enterprise payload or query to evaluate across OSS & Closed APIs..."></textarea>
+                                <div class="flex gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
+                                    <button onclick="loadPreset('summarize')" class="whitespace-nowrap px-3 py-1 rounded bg-[#010308] hover:bg-[#1a2744] border border-[#1a2744] text-[10px] text-slate-400 hover:text-cyan-400 transition-colors font-mono">ETL_Extract</button>
+                                    <button onclick="loadPreset('reasoning')" class="whitespace-nowrap px-3 py-1 rounded bg-[#010308] hover:bg-[#1a2744] border border-[#1a2744] text-[10px] text-slate-400 hover:text-cyan-400 transition-colors font-mono">SysLog_Audit</button>
+                                    <button onclick="loadPreset('compliance')" class="whitespace-nowrap px-3 py-1 rounded bg-[#010308] hover:bg-[#1a2744] border border-[#1a2744] text-[10px] text-slate-400 hover:text-cyan-400 transition-colors font-mono">PHI_Redact</button>
+                                </div>
+                            </div>
+                            
+                            <div class="p-5 flex-1 overflow-y-auto">
+                                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Tactical Constraints</h2>
+                                <div class="space-y-5">
+                                    <div class="flex items-center justify-between border-b border-[#1a2744] pb-4">
+                                        <div>
+                                            <div class="text-xs text-slate-300 font-bold">Cryptographic Prompt Sharding</div>
+                                            <div class="text-[10px] text-slate-500 mt-1">Disaggregates payload securely.</div>
+                                        </div>
+                                        <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                            <input type="checkbox" name="toggle" id="param-cps" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-slate-700 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10" checked/>
+                                            <label for="param-cps" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-700 cursor-pointer"></label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-2">
+                                            <span class="text-slate-300 font-bold">Max BIC Tolerance ($k \ln(n) - 2\ln(\hat{L})$)</span>
+                                            <span class="text-purple-400 font-mono font-bold" id="val-bic">12.5</span>
+                                        </div>
+                                        <input type="range" id="param-bic" min="5" max="30" step="0.5" value="12.5" oninput="document.getElementById('val-bic').textContent=Number(this.value).toFixed(1)" class="w-full accent-purple-500">
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-2">
+                                            <span class="text-slate-300 font-bold">Min Confidence Floor ($\tau$)</span>
+                                            <span class="text-cyan-400 font-mono font-bold" id="val-floor">0.85</span>
+                                        </div>
+                                        <input type="range" id="param-floor" min="0.5" max="0.99" step="0.01" value="0.85" oninput="document.getElementById('val-floor').textContent=Number(this.value).toFixed(2)" class="w-full accent-cyan-500">
+                                    </div>
+                                    
+                                    <div class="mt-6 p-4 bg-cyan-900/10 border border-cyan-500/30 rounded-lg">
+                                        <label class="text-[10px] text-cyan-400 font-mono font-bold uppercase mb-2 block flex items-center gap-2">✨ Auto-Tune Constraints</label>
+                                        <input type="text" id="auto-tune-intent" onkeydown="if(event.key==='Enter')autoTuneConstraints()" class="w-full bg-[#010308] border border-[#1a2744] focus:border-cyan-500 focus:outline-none rounded px-3 py-2 text-xs text-slate-300 font-mono mb-3 transition-colors shadow-inner" placeholder="e.g. 'High security lockdown, prioritize accuracy'">
+                                        <button id="btn-autotune" onclick="autoTuneConstraints()" class="w-full bg-[#010308] hover:bg-cyan-900/40 text-cyan-400 border border-cyan-500/50 py-2 rounded text-[10px] font-bold font-mono transition-colors">TUNE_PARAMETERS</button>
+                                        <div id="auto-tune-rationale" class="text-[10px] text-slate-400 mt-3 hidden font-mono leading-relaxed border-l-2 border-cyan-500 pl-2"></div>
+                                    </div>
+                                </div>
+                                <div class="px-5 pb-5">
+                                    <button id="btn-guardrail" onclick="evaluateGuardrails()" class="w-full mb-3 bg-[#010308] hover:bg-red-900/20 text-red-400 border border-red-900/50 font-mono font-bold py-2 rounded transition-all flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(239,68,68,0.1)]">
+                                        ✨ RUN_GUARDRAIL_SCAN
+                                    </button>
+                                    <button id="btn-route" onclick="executeNOCRouting()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-[#010308] font-mono font-bold py-3 rounded border border-cyan-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(14,165,233,0.4)] disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        EXECUTE_ECOSYSTEM_ROUTE
+                                    </button>
+                                </div>
+                            </div>
+                        </aside>
+
+                        <section class="flex-1 flex flex-col h-full overflow-y-auto relative z-10 p-6 space-y-6 scrollbar-hide bg-gradient-to-br from-transparent to-[#050b14]/80">
+                            <div class="flex flex-col lg:flex-row gap-6 min-h-[220px] shrink-0">
+                                <div class="w-full lg:w-[320px] glass-panel rounded p-4 flex flex-col border-cyan-900/30">
+                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Autotelic Logic</h3>
+                                    <div class="flex-1 flex flex-col justify-center">
+                                        <div id="decision-display" class="hidden flex-col items-center justify-center text-center">
+                                            <div class="text-[10px] text-slate-500 font-mono mb-1">TARGET_NODE TIER</div>
+                                            <div id="res-tier-badge" class="px-8 py-2 rounded-sm border-2 text-xl font-black font-mono tracking-widest shadow-[0_0_20px_rgba(0,0,0,0.8)] mb-2 bg-[#010308]">NANO</div>
+                                            <div id="res-optimal-model" class="text-[10px] font-mono text-cyan-400 border border-cyan-500/30 bg-cyan-900/20 px-3 py-1.5 rounded mb-5 shadow-inner mt-[-6px] break-words max-w-[90%]">MODEL: Llama-3-8B-Instruct</div>
+                                            
+                                            <div class="w-full space-y-4 text-left">
+                                                <div>
+                                                    <div class="flex justify-between text-[11px] font-mono mb-1">
+                                                        <span class="text-slate-400">POSSIBILITY ($\Pi$)</span><span class="text-slate-200" id="res-possibility">0.00</span>
+                                                    </div>
+                                                    <div class="w-full h-1 bg-[#010308] border border-[#1a2744]"><div id="bar-possibility" class="h-full bg-cyan-500 transition-all duration-1000 w-0 shadow-[0_0_8px_rgba(14,165,233,0.8)]"></div></div>
+                                                </div>
+                                                <div>
+                                                    <div class="flex justify-between text-[11px] font-mono mb-1">
+                                                        <span class="text-slate-400">DENSITY/COMPLEXITY</span><span class="text-purple-400" id="res-density">LOW</span>
+                                                    </div>
+                                                    <div class="w-full h-1 bg-[#010308] border border-[#1a2744] relative"><div id="bar-density" class="h-full bg-purple-500 transition-all duration-1000 w-0"></div></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="decision-empty" class="text-center text-slate-600 flex flex-col items-center"><span class="font-mono text-xs opacity-40">[NO_DATA]</span></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="w-full glass-panel rounded p-0 flex flex-col shrink-0 relative overflow-hidden flex-1 border-cyan-900/30">
+                                    <div class="h-8 bg-[#010308] border-b border-[#1a2744] flex items-center px-4 justify-between shrink-0">
+                                        <div class="flex items-center gap-3"><div class="w-2 h-2 rounded-sm bg-red-500/80 animate-pulse"></div><span class="ml-2 text-[10px] font-mono text-slate-400 uppercase tracking-widest">Algorithmic Telemetry Stream</span></div>
+                                    </div>
+                                    <div id="math-terminal" class="p-5 font-mono text-[11px] text-slate-300 flex-1 overflow-y-auto space-y-6 pb-8 scroll-smooth bg-transparent h-48 md:h-auto">
+                                        <div class="text-slate-600 italic">> Tactical Matrix initialized. Waiting for payload...</div>
+                                    </div>
+                                    <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] z-10 opacity-40"></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- VIEW: DATA ENGINEERING -->
+                    <div id="view-data-eng" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-4 md:p-6 gap-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <header class="w-full flex justify-between items-end border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-100 tracking-tight uppercase">Data Engineering & ETL Telemetry</h2>
+                                <p class="text-xs font-mono text-cyan-500 mt-1 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Status: Pipeline Ingestion Active
+                                </p>
+                            </div>
+                        </header>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                            <div class="flex flex-col gap-6 lg:col-span-1">
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Kafka Queue Depth</span><span class="text-purple-400 font-mono"><span id="val-queue">4,210</span> msgs</span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <defs><linearGradient id="areaQueue" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a855f7" stop-opacity="0.3"/><stop offset="100%" stop-color="#a855f7" stop-opacity="0.0"/></linearGradient></defs>
+                                            <path id="path-queue-area" d="M0,100 L100,100 Z" fill="url(#areaQueue)" />
+                                            <path id="path-queue-line" d="M0,100 L100,100" fill="none" stroke="#a855f7" stroke-width="1.5" class="chart-glow" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Data Quality Score</span><span class="text-emerald-400 font-mono"><span id="val-quality">99.8</span>%</span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <path id="path-quality-line" d="M0,100 L100,100" fill="none" stroke="#10b981" stroke-width="1.5" class="chart-glow-green" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> ETL Bottleneck Analysis</h3>
+                                    <p class="text-xs text-slate-300 leading-relaxed font-mono mb-4">
+                                        Monitoring real-time ingestion from distributed edge nodes. Occasional micro-spikes in the purple metric indicate Kafka partition imbalances during high-volume batch processing events. Data validation stages (green) hold steady >99%.
+                                    </p>
+                                    <div class="flex flex-col xl:flex-row gap-2 mt-auto">
+                                        <button id="btn-opt-spark" onclick="executeTabAgent('btn-opt-spark', 'data-eng-output', 'You are a Principal Data Engineer. Analyze an ETL pipeline bottleneck (high queue depth). Provide a highly technical, succinct optimization strategy (e.g., Kafka partitioning, Spark broadcast joins) for both engineering implementation and C-Suite review.', 'Generate Spark/Kafka optimization strategy.', 'PIPELINE_OPTIMIZATION_STRATEGY')" class="w-full bg-purple-900/20 hover:bg-purple-800/40 text-purple-400 border border-purple-900/50 font-mono font-bold py-3 rounded transition-all text-[10px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(168,85,247,0.1)]">
+                                            ✨ OPTIMIZE_PIPELINE
+                                        </button>
+                                        <button id="btn-gen-ddl" onclick="executeTabAgent('btn-gen-ddl', 'data-eng-output', 'You are a Lead Data Engineer. Generate a robust ClickHouse table DDL schema designed to rapidly ingest raw JSON LLM telemetry logs with heavy indexing and TTL eviction. Output only the SQL.', 'Generate ClickHouse DDL for high-throughput LLM telemetry ingestion.', 'CLICKHOUSE_TELEMETRY_DDL')" class="w-full bg-blue-900/20 hover:bg-blue-800/40 text-blue-400 border border-blue-900/50 font-mono font-bold py-3 rounded transition-all text-[10px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                                            ✨ GEN_TELEMETRY_DDL
+                                        </button>
+                                        <button id="btn-gen-dbt" onclick="executeTabAgent('btn-gen-dbt', 'data-eng-output', 'You are an Analytics Engineer. Write a dbt (Data Build Tool) SQL model using Jinja that parses a raw JSON payload from an LLM gateway (containing token_counts, model_id, latency) into a materialized incremental table. Output raw code without markdown.', 'Generate dbt incremental model.', 'DBT_INCREMENTAL_MODEL')" class="w-full bg-emerald-900/20 hover:bg-emerald-800/40 text-emerald-400 border border-emerald-900/50 font-mono font-bold py-3 rounded transition-all text-[10px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                            ✨ GENERATE_DBT_MODELS
+                                        </button>
+                                    </div>
+                                    <div id="data-eng-output" class="hidden mt-4 p-4 bg-[#010308] border border-[#1a2744] rounded text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: DATA SCIENCE -->
+                    <div id="view-data-sci" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-4 md:p-6 gap-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <header class="w-full flex justify-between items-end border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-100 tracking-tight uppercase">Data Science & Experimentation</h2>
+                                <p class="text-xs font-mono text-cyan-500 mt-1 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                                    Status: Training Run #4092 Active
+                                </p>
+                            </div>
+                        </header>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                            <div class="flex flex-col gap-6 lg:col-span-1">
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Log-Loss Convergence</span><span><span class="text-blue-400 font-mono" id="val-train">0.21</span> / <span class="text-red-400 font-mono" id="val-val">0.34</span></span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <path id="path-train-line" d="M0,100 L100,100" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+                                            <path id="path-val-line" d="M0,100 L100,100" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 2"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Feature Entropy</span><span class="text-emerald-400 font-mono"><span id="val-entropy">4.2</span> bits</span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <path id="path-entropy-line" d="M0,100 L100,100" fill="none" stroke="#10b981" stroke-width="1.5" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> Training Diagnostics</h3>
+                                    <p class="text-xs text-slate-300 leading-relaxed font-mono mb-4">
+                                        The solid blue line indicates training loss, while the dashed red line tracks validation loss. A growing divergence signals potential overfitting in the current epoch batch. Feature entropy remains stable, suggesting robust mutual information retention across the manifold.
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-2 mt-auto">
+                                        <button id="btn-diag-overfit" onclick="executeTabAgent('btn-diag-overfit', 'data-sci-output', 'You are a Lead Data Scientist. Diagnose training vs validation loss divergence (overfitting). Suggest advanced regularization techniques (e.g., label smoothing, weight decay) in a succinct format suitable for ML researchers and engineering managers.', 'Diagnose loss divergence and recommend regularization.', 'OVERFIT_DIAGNOSTIC')" class="w-full bg-blue-900/20 hover:bg-blue-800/40 text-blue-400 border border-blue-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(59,130,246,0.1)]">
+                                            ✨ DIAGNOSE_OVERFITTING
+                                        </button>
+                                        <button id="btn-gen-synth" onclick="executeTabAgent('btn-gen-synth', 'data-sci-output', 'You are an Elite Data Scientist. Write a Python script using the SDV (Synthetic Data Vault) library or SMOTE to augment an imbalanced training dataset to prevent validation loss divergence. Output raw Python code without markdown wrappers.', 'Generate synthetic data augmentation script.', 'SYNTHETIC_DATA_GENERATION')" class="w-full bg-fuchsia-900/20 hover:bg-fuchsia-800/40 text-fuchsia-400 border border-fuchsia-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(217,70,239,0.1)]">
+                                            ✨ GEN_SYNTHETIC_SCRIPT
+                                        </button>
+                                    </div>
+                                    <div id="data-sci-output" class="hidden mt-4 p-4 bg-[#010308] border border-[#1a2744] rounded text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: ML ENGINEERING -->
+                    <div id="view-ml-eng" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-4 md:p-6 gap-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <header class="w-full flex justify-between items-end border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-100 tracking-tight uppercase">ML Engineering & Serving Infra</h2>
+                                <p class="text-xs font-mono text-cyan-500 mt-1 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                                    Status: K8s HPA Scaling Operational
+                                </p>
+                            </div>
+                        </header>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                            <div class="flex flex-col gap-6 lg:col-span-1">
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Active Pod Replicas</span><span class="text-cyan-400 font-mono"><span id="val-replica">14</span></span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <defs><linearGradient id="areaReplica" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.3"/><stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.0"/></linearGradient></defs>
+                                            <path id="path-replica-area" d="M0,100 L100,100 Z" fill="url(#areaReplica)" />
+                                            <path id="path-replica-line" d="M0,100 L100,100" fill="none" stroke="#0ea5e9" stroke-width="1.5" class="chart-glow" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Aggregated Batch Size</span><span class="text-fuchsia-400 font-mono"><span id="val-batch">32</span> items</span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <path id="path-batch-line" d="M0,100 L100,100" fill="none" stroke="#d946ef" stroke-width="1.5" class="chart-glow-magenta" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> Serving Telemetry</h3>
+                                    <p class="text-xs text-slate-300 leading-relaxed font-mono mb-4">
+                                        Dynamic batch aggregation is actively maintaining high GPU utilization. However, traffic spikes are triggering rapid Horizontal Pod Autoscaler (HPA) events. Custom KEDA triggers may be required to smooth out replica scaling and prevent thrashing.
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-2 mt-auto">
+                                        <button id="btn-gen-scaler" onclick="executeTabAgent('btn-gen-scaler', 'ml-eng-output', 'You are a Staff MLOps Engineer. Generate a highly optimized Kubernetes Horizontal Pod Autoscaler (HPA) or KEDA scaled object YAML for deploying a heavy LLM model. Address rapid scaling spikes. Output raw YAML only, no markdown backticks.', 'Generate K8s scaler YAML for heavy LLM workload.', 'K8S_AUTOSCALER_YAML')" class="w-full bg-cyan-900/20 hover:bg-cyan-800/40 text-cyan-400 border border-cyan-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(14,165,233,0.1)]">
+                                            ✨ AUTO_GEN_K8S_SCALER
+                                        </button>
+                                        <button id="btn-opt-vllm" onclick="executeTabAgent('btn-opt-vllm', 'ml-eng-output', 'You are an Elite ML Inference Engineer. Generate the optimal vLLM engine launch arguments (CLI flags) for deploying Llama-3-8B on NVIDIA L4 GPUs to maximize throughput (e.g. chunked prefill, max model len, gpu memory util). Provide only the bash command, no markdown formatting.', 'Generate optimized vLLM launch arguments.', 'VLLM_OPTIMIZATION_FLAGS')" class="w-full bg-emerald-900/20 hover:bg-emerald-800/40 text-emerald-400 border border-emerald-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+                                            ✨ OPTIMIZE_vLLM_ARGS
+                                        </button>
+                                    </div>
+                                    <div id="ml-eng-output" class="hidden mt-4 p-4 bg-[#010308] border border-[#1a2744] rounded text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: AI ENGINEERING -->
+                    <div id="view-ai-eng" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-4 md:p-6 gap-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <header class="w-full flex justify-between items-end border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-100 tracking-tight uppercase">AI Engineering & LLM Pipelines</h2>
+                                <p class="text-xs font-mono text-cyan-500 mt-1 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                                    Status: Context Window Saturation Warning
+                                </p>
+                            </div>
+                        </header>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                            <div class="flex flex-col gap-6 lg:col-span-1">
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Generation Speeds</span><span><span class="text-cyan-400 font-mono" id="val-ttft">120</span> <span class="text-slate-500">TTFT</span> / <span class="text-emerald-400 font-mono" id="val-tpot">15</span> <span class="text-slate-500">TPOT</span></span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <path id="path-ttft-line" d="M0,100 L100,100" fill="none" stroke="#0ea5e9" stroke-width="1.5" />
+                                            <path id="path-tpot-line" d="M0,100 L100,100" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 2"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="glass-panel rounded p-5 flex flex-col h-[220px] border-[#1a2744] relative">
+                                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                        <span>Context Saturation</span><span class="text-red-400 font-mono"><span id="val-context">92</span>%</span>
+                                    </h3>
+                                    <div class="flex-1 relative w-full h-full">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <defs><linearGradient id="areaCtx" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.3"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"/></linearGradient></defs>
+                                            <path id="path-context-area" d="M0,100 L100,100 Z" fill="url(#areaCtx)" />
+                                            <path id="path-context-line" d="M0,100 L100,100" fill="none" stroke="#ef4444" stroke-width="1.5" class="chart-glow-red" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> Prompt Execution Metrics</h3>
+                                    <p class="text-xs text-slate-300 leading-relaxed font-mono mb-4">
+                                        Time To First Token (TTFT) and Time Per Output Token (TPOT) are experiencing variance. Massive retrieved payloads from the RAG layer are pushing the LLM Context Window Saturation above 90%, causing compute overhead and degradation in multi-turn alignment logic.
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-2 mt-auto">
+                                        <button id="btn-opt-prompt" onclick="executeTabAgent('btn-opt-prompt', 'ai-eng-output', 'You are an AI Architect. The context window saturation is >90% and TTFT is spiking. Generate a technical, succinct prompt compression or semantic caching strategy for the engineering team and C-suite.', 'Draft prompt compression and context eviction strategy.', 'PROMPT_COMPRESSION_STRATEGY')" class="w-full bg-purple-900/20 hover:bg-purple-800/40 text-purple-400 border border-purple-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(168,85,247,0.1)]">
+                                            ✨ COMPRESS_SYSTEM_PROMPT
+                                        </button>
+                                        <button id="btn-dspy-pipeline" onclick="executeTabAgent('btn-dspy-pipeline', 'ai-eng-output', 'You are a cutting-edge AI Engineer. Write a complete Python script using the Stanford DSPy framework. Define a dspy.Signature for RAG QA, a dspy.Module using ChainOfThought, and a BootstrapFewShot teleprompter to optimize the context window. Output raw Python code without markdown.', 'Write DSPy compiler script for context optimization.', 'DSPY_COMPILER_PIPELINE')" class="w-full bg-orange-900/20 hover:bg-orange-800/40 text-orange-400 border border-orange-900/50 font-mono font-bold py-3 rounded transition-all text-[11px] flex justify-center items-center gap-2 shadow-[0_0_10px_rgba(249,115,22,0.1)]">
+                                            ✨ GENERATE_DSPY_PIPELINE
+                                        </button>
+                                    </div>
+                                    <div id="ai-eng-output" class="hidden mt-4 p-4 bg-[#010308] border border-[#1a2744] rounded text-[11px] font-mono text-slate-300 max-h-64 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW: CLOUD ARCHITECTURE -->
+                    <div id="view-arch" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-4 md:p-6 lg:p-8 gap-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <header class="w-full flex justify-between items-end border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-bold text-slate-100 tracking-tight uppercase">Cloud Architecture & RAG Pipelines</h2>
+                                <p class="text-xs font-mono text-cyan-500 mt-1 uppercase tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    Status: Global Fleet Synchronized
+                                </p>
+                            </div>
+                        </header>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow">
+                            <!-- Left Col: Global Node Topology -->
+                            <div class="flex flex-col gap-6 lg:col-span-1">
+                                <div class="w-full glass-panel rounded p-6 flex flex-col items-center justify-center relative overflow-hidden border-[#1a2744] min-h-[300px]">
+                                    <h3 class="absolute top-4 left-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Global Node Topology</h3>
+                                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMwMTAzMDgiPjwvcmVjdD48cGF0aCBkPSJNMCAwTDIgMkw0IDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzEwYjk4MSIgc3Ryb2tlLXdpZHRoPSIwLjUiIG9wYWNpdHk9IjAuMSI+PC9wYXRoPjwvc3ZnPg==')] opacity-20"></div>
+                                    <div id="arch-node-matrix" class="hex-grid w-full h-[200px] overflow-hidden opacity-90 z-10 mt-6">
+                                        <!-- Nodes injected by JS -->
+                                    </div>
+                                    <div class="flex items-center gap-4 text-[9px] font-mono text-slate-500 mt-4 z-10 bg-[#010308] px-3 py-1 rounded border border-[#1a2744]">
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-sm bg-[#10b981]"></div> US-EAST</span>
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-sm bg-[#0ea5e9]"></div> EU-WEST</span>
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 rounded-sm bg-[#8b5cf6]"></div> APAC-1</span>
+                                    </div>
+                                </div>
+                                <div class="w-full glass-panel rounded p-4 text-xs text-slate-400 space-y-3 bg-[#010308]">
+                                    <h3 class="text-slate-200 font-bold mb-2">Active Model Registry</h3>
+                                    <div class="flex justify-between border-b border-[#1a2744] pb-1">
+                                        <span class="font-mono text-cyan-400">Llama-3-8B-Instruct</span> 
+                                        <span class="px-1.5 py-0.5 rounded bg-emerald-900/30 text-emerald-400 text-[9px]">INT4</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-[#1a2744] pb-1">
+                                        <span class="font-mono text-cyan-400">Mistral-Nemo</span> 
+                                        <span class="px-1.5 py-0.5 rounded bg-blue-900/30 text-blue-400 text-[9px]">FP8</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-[#1a2744] pb-1">
+                                        <span class="font-mono text-cyan-400">Claude-3.5-Haiku</span> 
+                                        <span class="px-1.5 py-0.5 rounded bg-purple-900/30 text-purple-400 text-[9px]">API</span>
+                                    </div>
+                                    <div class="flex justify-between border-b border-[#1a2744] pb-1">
+                                        <span class="font-mono text-cyan-400">bge-m3-large (Embed)</span> 
+                                        <span class="px-1.5 py-0.5 rounded bg-emerald-900/30 text-emerald-400 text-[9px]">FP16</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Right Col: RAG Telemetry & Architect Chat -->
+                            <div class="lg:col-span-2 flex flex-col gap-6">
+                                <div class="w-full glass-panel rounded p-6 flex flex-col border-[#1a2744] h-[300px] relative">
+                                    <h3 class="absolute top-4 left-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono z-10">RAG Pipeline Latency Telemetry</h3>
+                                    <div class="absolute top-4 right-4 flex gap-4 text-[9px] font-mono text-slate-400 z-10">
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 bg-emerald-500"></div> Embedding (<span id="val-embed">12</span>ms)</span>
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 bg-blue-500"></div> Vector DB (<span id="val-vdb">45</span>ms)</span>
+                                        <span class="flex items-center gap-1"><div class="w-2 h-2 bg-purple-500"></div> LLM Gen (<span id="val-llm">850</span>ms)</span>
+                                    </div>
+                                    <div class="w-full h-full mt-6 relative">
+                                        <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                            <defs>
+                                                <linearGradient id="areaLLM" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6" stop-opacity="0.3" /><stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.0" /></linearGradient>
+                                                <linearGradient id="areaVDB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4" /><stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0" /></linearGradient>
+                                                <linearGradient id="areaEmbed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.5" /><stop offset="100%" stop-color="#10b981" stop-opacity="0.0" /></linearGradient>
+                                            </defs>
+                                            <path id="path-llm-area" d="M0,100 L100,100 Z" fill="url(#areaLLM)" />
+                                            <path id="path-llm-line" d="M0,100 L100,100" fill="none" stroke="#8b5cf6" stroke-width="1.5" />
+                                            <path id="path-vdb-area" d="M0,100 L100,100 Z" fill="url(#areaVDB)" />
+                                            <path id="path-vdb-line" d="M0,100 L100,100" fill="none" stroke="#3b82f6" stroke-width="1.5" />
+                                            <path id="path-embed-area" d="M0,100 L100,100 Z" fill="url(#areaEmbed)" />
+                                            <path id="path-embed-line" d="M0,100 L100,100" fill="none" stroke="#10b981" stroke-width="1.5" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="w-full glass-panel rounded p-6 flex flex-col border-[#1a2744] flex-1">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> ✨ AI Topology Architect</h3>
+                                    <p class="text-xs text-slate-400 mb-4 font-mono">Query the Gemini agent for automated scaling and RAG optimization strategies based on current fleet metrics.</p>
+                                    <div class="flex flex-col sm:flex-row gap-2">
+                                        <button onclick="consultCloudArchitect()" id="btn-consult-arch" class="w-full bg-cyan-600 hover:bg-cyan-500 text-[#010308] font-mono font-bold py-3 rounded border border-cyan-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(14,165,233,0.4)] disabled:opacity-50 disabled:cursor-not-allowed text-[11px]">
+                                            ARCHITECT_RECOMMENDATION
+                                        </button>
+                                        <button onclick="executeTabAgent('btn-sim-failover', 'arch-llm-output', 'You are a Cloud Infrastructure SRE. Simulate a catastrophic failure of the US-EAST region. Generate a raw Terraform snippet for updating a Global HTTPS Load Balancer to immediately route traffic to EU-WEST and APAC-1. Output raw code without markdown.', 'Simulate failover and generate Terraform routing rules.', 'REGION_FAILOVER_TERRAFORM')" id="btn-sim-failover" class="w-full bg-red-900/20 hover:bg-red-800/40 text-red-400 border border-red-900/50 font-mono font-bold py-3 rounded transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.2)] disabled:opacity-50 disabled:cursor-not-allowed text-[11px]">
+                                            ✨ SIMULATE_REGION_FAILOVER
+                                        </button>
+                                    </div>
+                                    <div id="arch-llm-output" class="hidden mt-4 p-4 bg-[#010308] border border-cyan-900/50 rounded text-[11px] font-mono text-cyan-200 max-h-64 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 4: SYS PERF -->
+                    <div id="view-perf" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-6 space-y-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <div class="w-full flex items-center justify-between border-b border-[#1a2744] pb-4 shrink-0">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-100 font-mono tracking-wide">SYSTEM PERFORMANCE & HARDWARE DYNAMICS</h2>
+                                <p class="text-sm text-slate-500 mt-1">Live token throughput, VRAM saturation, asynchronous latency monitoring, and FinOps tokenomics.</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 w-full shrink-0">
+                            <div class="glass-panel rounded p-5 flex flex-col relative h-[220px] border-cyan-900/30">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                    <span>Global Throughput</span><span class="text-cyan-400 font-mono"><span id="live-tps-val">18,402</span> t/s</span>
+                                </h3>
+                                <div class="flex-1 relative w-full h-full">
+                                    <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                        <defs><linearGradient id="areaCyan" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.4" /><stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.0" /></linearGradient></defs>
+                                        <path id="throughput-area" d="M0,100 L100,100 Z" fill="url(#areaCyan)" />
+                                        <path id="throughput-line" d="M0,100 L100,100" fill="none" stroke="#0ea5e9" stroke-width="1.5" class="chart-glow" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="glass-panel rounded p-5 flex flex-col relative h-[220px] border-fuchsia-900/30">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                    <span>P99 Edge Latency</span><span class="text-fuchsia-400 font-mono"><span id="live-lat-val">42.1</span> ms</span>
+                                </h3>
+                                <div class="flex-1 relative w-full h-full">
+                                    <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                        <path id="latency-line" d="M0,100 L100,100" fill="none" stroke="#d946ef" stroke-width="1.5" class="chart-glow-magenta" />
+                                        <line x1="0" y1="30" x2="100" y2="30" stroke="#ef4444" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+                                        <text x="2" y="25" fill="#ef4444" font-size="4" font-family="monospace" opacity="0.8">SLA 50ms</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="glass-panel rounded p-5 flex flex-col relative h-[220px] border-emerald-900/30">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                    <span>KV-Cache VRAM Saturation</span><span class="text-emerald-400 font-mono"><span id="live-gpu-val">45.2</span>%</span>
+                                </h3>
+                                <div class="flex-1 relative w-full h-full">
+                                    <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                        <defs><linearGradient id="areaGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981" stop-opacity="0.3" /><stop offset="100%" stop-color="#10b981" stop-opacity="0.0" /></linearGradient></defs>
+                                        <path id="gpu-area" d="M0,100 L100,100 Z" fill="url(#areaGreen)" />
+                                        <path id="gpu-line" d="M0,100 L100,100" fill="none" stroke="#10b981" stroke-width="1.5" class="chart-glow-green" />
+                                        <line x1="0" y1="15" x2="100" y2="15" stroke="#f59e0b" stroke-width="1" stroke-dasharray="2 2" opacity="0.8"/>
+                                        <text x="2" y="10" fill="#f59e0b" font-size="4" font-family="monospace" opacity="0.9">EVICTION THRESHOLD (85%)</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="glass-panel rounded p-5 flex flex-col relative h-[220px] border-amber-900/30">
+                                <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2 flex justify-between">
+                                    <span>FinOps Arbitrage Spread</span><span class="text-amber-400 font-mono">Δ $<span id="live-arb-val">0.024</span> / 1k</span>
+                                </h3>
+                                <div class="flex-1 relative w-full h-full">
+                                    <svg class="absolute inset-0 w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                                        <defs>
+                                            <linearGradient id="areaAmber" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.3" />
+                                                <stop offset="100%" stop-color="#06b6d4" stop-opacity="0.0" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path id="arb-spread-area" d="M0,100 L0,50 L100,50 L100,100 Z" fill="url(#areaAmber)" />
+                                        <path id="arb-mono-line" d="M0,100 L100,100" fill="none" stroke="#06b6d4" stroke-width="1.5" />
+                                        <path id="arb-routed-line" d="M0,100 L100,100" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 2" class="chart-glow-amber" />
+                                        <text x="2" y="22" fill="#64748b" font-size="4" font-family="monospace">Monolithic Baseline</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 shrink-0">
+                            <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]">
+                                <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest mb-4 font-mono">> Engineering & FinOps Interpretations</h3>
+                                <div class="text-xs text-slate-300 space-y-4 leading-relaxed font-mono">
+                                    <p class="border-l-2 border-fuchsia-500 pl-3"><strong class="text-fuchsia-400">P99 Latency Integrity:</strong> SLA Compliance holds at 99.99%. Volatility in the fuchsia metric tracks highly complex payload evaluations triggering <code>Frontier</code> failovers. Standard `Nano` executions resolve within $< 20ms$ locally.</p>
+                                    <p class="border-l-2 border-emerald-500 pl-3"><strong class="text-emerald-400">KV-Cache & GPU Memory Limits:</strong> VRAM saturation fluctuates with concurrent batch sequence lengths. Using FlashAttention-2, we prevent Out-Of-Memory (OOM) faults via proactive KV-Cache eviction when the green metric approaches the 85% safety threshold.</p>
+                                    <p class="border-l-2 border-amber-500 pl-3"><strong class="text-amber-400">Tokenomics Arbitrage:</strong> The hatched region in the FinOps chart visualizes direct cost-avoidance. By dynamically shifting 70% of volume to Open-Source (HuggingFace) and localized models instead of closed-API monoliths, the engine establishes an arbitrage spread averaging $0.024 saved per 1k tokens.</p>
+                                </div>
+                            </div>
+                            <div class="glass-panel rounded p-6 flex flex-col border-[#1a2744]" id="math-perf-content">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-[11px] font-bold text-purple-400 uppercase tracking-widest font-mono">> Hardware & Stochastic Mathematical Proofs</h3>
+                                    <button id="btn-sys-scan" onclick="scanSystemPerf()" class="bg-purple-900/20 hover:bg-purple-800/40 text-purple-400 border border-purple-900/50 font-mono py-1 px-3 rounded transition-all text-[10px] shadow-[0_0_10px_rgba(168,85,247,0.1)]">✨ RUN_HEALTH_SCAN</button>
+                                </div>
+                                <div id="sys-scan-output" class="hidden mb-4 p-4 bg-[#010308] border border-purple-900/50 rounded text-xs text-purple-100 font-mono whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                <div class="text-xs text-slate-400 space-y-4">
+                                    <div>
+                                        <p class="mb-1"><span class="text-emerald-400 font-bold">Eq. 1: GPU KV-Cache Memory Footprint</span></p>
+                                        <div class="bg-[#010308] p-2 rounded border border-[#1a2744] text-center text-slate-200 overflow-x-auto text-[10px]">
+                                            $$M_{KV} = 2 \cdot b \cdot s \cdot h_{layers} \cdot d_{head} \cdot P_{bytes}$$
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1"><span class="text-amber-400 font-bold">Eq. 2: Expected Arbitrage Savings (FinOps)</span></p>
+                                        <div class="bg-[#010308] p-2 rounded border border-[#1a2744] text-center text-slate-200 text-[10px] overflow-x-auto">
+                                            $$\mathbb{E}[\Delta C_{saved}] = \sum_{t \in \{\text{Nano, Std, Front}\}} P(T=t) \left( C_{mono} - C_t \right)$$
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VIEW 5: SRE COPILOT -->
+                    <div id="view-sre" class="w-full h-full flex flex-col absolute inset-0 opacity-0 pointer-events-none transition-opacity duration-300 overflow-y-auto scrollbar-hide p-6 bg-gradient-to-b from-[#010308] to-[#050b14] hidden">
+                        <div class="w-full flex items-center justify-between border-b border-[#1a2744] pb-4 shrink-0 mb-6">
+                            <div>
+                                <h2 class="text-xl font-bold text-slate-100 font-mono tracking-wide">SRE INCIDENT COPILOT</h2>
+                                <p class="text-sm text-slate-500 mt-1">LLM-powered root cause analysis and mitigation scripting via Gemini.</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col lg:flex-row gap-6 h-full">
+                            <aside class="w-full lg:w-[400px] flex flex-col gap-6">
+                                <div class="glass-panel rounded p-5 flex flex-col border-[#1a2744]">
+                                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Raw Telemetry / Logs</h3>
+                                    <textarea id="sre-input" class="w-full bg-[#010308] border border-[#1a2744] rounded p-3 text-slate-200 text-xs focus:border-cyan-500 focus:outline-none font-mono resize-none flex-1 mb-4 shadow-inner min-h-[150px]" placeholder="Paste stack trace, Kubernetes events, or syslog dumps here..."></textarea>
+                                    <button id="btn-diagnose" onclick="diagnoseIncident()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-[#010308] font-mono font-bold py-3 rounded border border-cyan-400 transition-all flex justify-center items-center gap-2 shadow-[0_0_15px_rgba(14,165,233,0.4)] disabled:opacity-50 disabled:cursor-not-allowed">
+                                        ✨ DIAGNOSE_INCIDENT
+                                    </button>
+                                </div>
+                                
+                                <div class="glass-panel rounded p-5 flex flex-col border-[#1a2744] flex-1 min-h-[250px] relative overflow-hidden items-center justify-center">
+                                    <h3 class="absolute top-4 left-4 text-[10px] font-bold text-red-400 uppercase tracking-widest font-mono z-20">Adversarial Threat Radar</h3>
+                                    <div class="relative w-48 h-48 mt-4 rounded-full border border-[#1a2744] bg-[#010308] shadow-[0_0_20px_rgba(14,165,233,0.1)] flex items-center justify-center overflow-hidden">
+                                        <div class="absolute inset-4 rounded-full border border-[#1a2744]"></div>
+                                        <div class="absolute inset-12 rounded-full border border-[#1a2744]"></div>
+                                        <div class="absolute inset-20 rounded-full border border-[#1a2744]"></div>
+                                        <div class="absolute w-full h-px bg-[#1a2744]"></div>
+                                        <div class="absolute h-full w-px bg-[#1a2744]"></div>
+                                        <div class="absolute w-24 h-24 right-0 bottom-1/2 origin-bottom-left radar-sweep bg-gradient-to-tr from-cyan-500/40 to-transparent rounded-tr-full z-10"></div>
+                                        <div id="radar-blips" class="absolute inset-0 z-20 pointer-events-none"></div>
+                                    </div>
+                                </div>
+                            </aside>
+                            
+                            <section class="flex-1 glass-panel rounded p-6 flex flex-col border-[#1a2744] overflow-y-auto">
+                                <div class="flex justify-between items-center mb-4 shrink-0">
+                                    <h3 class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest font-mono">> Diagnostic Output</h3>
+                                    <button id="btn-post-mortem" onclick="generatePostMortem()" class="hidden bg-purple-900/20 hover:bg-purple-800/40 text-purple-400 border border-purple-900/50 font-mono py-1 px-3 rounded transition-all text-[10px] shadow-[0_0_10px_rgba(168,85,247,0.1)]">✨ GEN_POST_MORTEM</button>
+                                </div>
+                                
+                                <div id="sre-output" class="hidden flex-col gap-6">
+                                    <div class="flex items-center gap-4">
+                                        <div id="sre-severity" class="px-4 py-2 text-lg font-black font-mono border-2 rounded"></div>
+                                        <div>
+                                            <div class="text-[10px] text-slate-500 font-mono">ROOT CAUSE</div>
+                                            <div id="sre-root" class="text-lg text-slate-200 font-semibold"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 font-mono mb-2">EXECUTIVE SUMMARY</div>
+                                        <div id="sre-summary" class="text-sm text-slate-300 leading-relaxed border-l-2 border-cyan-500 pl-3"></div>
+                                    </div>
+                                    <div>
+                                        <div class="text-[10px] text-slate-500 font-mono mb-2">MITIGATION STEPS</div>
+                                        <ul id="sre-steps" class="list-decimal pl-5 text-sm text-slate-300 space-y-2 font-mono"></ul>
+                                    </div>
+                                </div>
+                                <div id="sre-pm-output" class="hidden mt-4 p-4 bg-[#010308] border border-purple-900/50 rounded text-xs text-purple-100 font-mono whitespace-pre-wrap shadow-inner leading-relaxed"></div>
+                                <div id="sre-empty" class="flex-1 flex items-center justify-center text-slate-600 font-mono text-xs opacity-50">
+                                    [AWAITING_TELEMETRY]
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- API Configuration ---
+        const apiKey = ""; 
+
+        async function fetchWithRetry(url, options, retries = 5) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+        async function callGemini(systemPrompt, userText, schema = null) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userText }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+            if (schema) {
+                payload.generationConfig = {
+                    responseMimeType: "application/json",
+                    responseSchema: schema
+                };
+            }
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            };
+            const result = await fetchWithRetry(url, options);
+            return result.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        }
+
+        function toggleMenu(){ document.getElementById('navlinks').classList.toggle('hidden'); }
+
+        // --- Core Application Logic Setup ---
+        let chartsRunning = false;
+        let goroutineCount = 4192;
+        let goroutineInterval = null;
+
+        function updateGoroutines() {
+            const el = document.getElementById('hdr-routines');
+            if(el) {
+                goroutineCount = 4000 + Math.floor(Math.random() * 500);
+                el.innerText = goroutineCount.toLocaleString();
+            }
+        }
+
+        function unlockNOC() {
+            const keyElement = document.getElementById('noc-key');
+            if(!keyElement || !keyElement.value) return;
+
+            document.getElementById('noc-app-wrapper').classList.remove('hidden');
+            const app = document.getElementById('noc-app');
+            app.classList.remove('opacity-20', 'pointer-events-none');
+            app.classList.add('opacity-100', 'pointer-events-auto');
+            
+            setTimeout(() => {
+                const driftContent = document.getElementById('math-drift-content');
+                if (driftContent && typeof renderMathInElement === 'function') {
+                    renderMathInElement(driftContent, { delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}], throwOnError: false });
+                }
+                if(!chartsRunning) {
+                    chartsRunning = true;
+                    animatePerformanceGraphs();
+                }
+                if(!goroutineInterval) {
+                    goroutineInterval = setInterval(updateGoroutines, 2000);
+                }
+            }, 500);
+        }
+
+        function closeNOC() {
+            document.getElementById('noc-app-wrapper').classList.add('hidden');
+            document.getElementById('noc-key').value = '';
+            if (goroutineInterval) {
+                clearInterval(goroutineInterval);
+                goroutineInterval = null;
+            }
+            chartsRunning = false;
+        }
+
+        function switchView(target) {
+            ['routing', 'drift', 'arch', 'perf', 'sre', 'data-eng', 'data-sci', 'ml-eng', 'ai-eng'].forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) {
+                    if (v === target) {
+                        el.classList.remove('opacity-0', 'pointer-events-none', 'hidden');
+                        el.classList.add('flex');
+                    } else {
+                        el.classList.add('opacity-0', 'pointer-events-none', 'hidden');
+                        el.classList.remove('flex');
+                    }
+                }
+            });
+
+            ['tab-routing', 'tab-drift', 'tab-arch', 'tab-perf', 'tab-sre', 'tab-data-eng', 'tab-data-sci', 'tab-ml-eng', 'tab-ai-eng'].forEach(t => {
+                const el = document.getElementById(t);
+                if (el) {
+                    if (t === `tab-${target}`) {
+                        el.classList.remove('text-slate-500', 'hover:text-slate-300', 'border-transparent');
+                        el.classList.add('text-cyan-400', 'bg-cyan-900/30', 'border-cyan-500/30');
+                    } else {
+                        el.classList.add('text-slate-500', 'hover:text-slate-300', 'border-transparent');
+                        el.classList.remove('text-cyan-400', 'bg-cyan-900/30', 'border-cyan-500/30');
+                    }
+                }
+            });
+        }
+
+        // --- NEW: Universal Executable Tab Agent ---
+        async function executeTabAgent(btnId, outputId, sysPrompt, userPrompt, title) {
+            const btn = document.getElementById(btnId);
+            const output = document.getElementById(outputId);
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '✨ EXECUTING...';
+            output.classList.remove('hidden');
+            output.innerHTML = `<span class="animate-pulse text-cyan-500">Synthesizing ${title.toLowerCase()}...</span>`;
+
+            try {
+                let resp = await callGemini(sysPrompt, userPrompt);
+                resp = resp.replace(/```(python|sql|yaml|hcl|bash)?/gi, '').replace(/```/g, '').trim();
+                output.innerHTML = `<strong class="text-cyan-400 block mb-2">[${title}]</strong>${resp.replace(/\n/g, '<br>')}`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500 font-bold">ERROR:</span> ${e.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        }
+
+        function loadPreset(type) {
+            const el = document.getElementById('prompt-input');
+            if(!el) return;
+            if (type === 'summarize') el.value = "Extract the key entities, dates, and financial figures from the provided text block and output them as a strict JSON array.";
+            if (type === 'reasoning') el.value = "Analyze the provided Kubernetes cluster logs. Identify the root cause of the intermittent crash loop in the payment microservice, ignoring routine health check failures.";
+            if (type === 'compliance') el.value = "Review the attached patient interaction transcript. Redact all PII and PHI according to HIPAA Safe Harbor guidelines. Retain the clinical intent and sentiment of the conversation. Output the redacted text and a confidence score for the redaction.";
+        }
+
+        function updateSDMLabel(val) {
+            const labels = ["LENIENT", "BALANCED", "STRICT"];
+            const el = document.getElementById('val-sdm');
+            if (el) el.textContent = labels[val - 1];
+        }
+
+        function togglePayloadModal() {
+            const modal = document.getElementById('payload-modal');
+            if (modal) {
+                modal.classList.toggle('hidden');
+                modal.classList.toggle('flex');
+            }
+        }
+
+        // ✨ ENHANCED FEATURE: Dynamic Triage and Go/BIC Integration
+        async function executeNOCRouting() {
+            const btn = document.getElementById('btn-route');
+            const input = document.getElementById('prompt-input').value.trim();
+            const floor = document.getElementById('param-floor').value;
+            const bicTolerance = document.getElementById('param-bic').value;
+            const cpsEl = document.getElementById('param-cps');
+            const cpsEnabled = cpsEl ? cpsEl.checked : false;
+            
+            if (!input) return alert("Please enter a payload to route.");
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">EVALUATING_ECOSYSTEM via GO ROUTER... ✨</span>';
+
+            const wordCount = input.split(' ').length;
+            const densityScore = Math.min(1.0, wordCount / 50.0); 
+            const complexityStr = densityScore > 0.6 ? 'HIGH' : 'LOW';
+            
+            const calcBic = (2.5 * Math.log(wordCount + 10)) - (2 * Math.log(0.85));
+
+            let tier = densityScore > 0.6 ? "Frontier" : "Nano";
+            if (calcBic > parseFloat(bicTolerance)) tier = "Standard"; 
+            
+            const possibility = 0.82 + (Math.random() * 0.15);
+            
+            if (possibility < parseFloat(floor) && tier === "Nano") tier = "Standard";
+
+            const TIER_COLORS = { 'Nano': '#10b981', 'Standard': '#0ea5e9', 'Frontier': '#8b5cf6' };
+            const color = TIER_COLORS[tier];
+
+            const decEmpty = document.getElementById('decision-empty');
+            if(decEmpty) decEmpty.classList.add('hidden');
+            const decDisp = document.getElementById('decision-display');
+            if(decDisp) decDisp.style.display = 'flex';
+            
+            const badge = document.getElementById('res-tier-badge');
+            if(badge) {
+                badge.textContent = tier.toUpperCase();
+                badge.style.color = color;
+                badge.style.borderColor = color;
+            }
+
+            const modelTarget = document.getElementById('res-optimal-model');
+            if (modelTarget) {
+                modelTarget.textContent = `TARGET: ${tier === "Frontier" ? "Claude-3.5-Haiku" : (tier === "Standard" ? "Mistral-Nemo" : "Meta-Llama-3-8B")}`;
+            }
+
+            const resPoss = document.getElementById('res-possibility');
+            if(resPoss) resPoss.textContent = possibility.toFixed(3);
+            const resDen = document.getElementById('res-density');
+            if(resDen) resDen.textContent = `${complexityStr} (${calcBic.toFixed(1)} BIC)`;
+            
+            setTimeout(() => {
+                const bPoss = document.getElementById('bar-possibility');
+                if(bPoss) {
+                    bPoss.style.width = `${possibility*100}%`;
+                    bPoss.style.backgroundColor = color;
+                }
+                const bDen = document.getElementById('bar-density');
+                if(bDen) bDen.style.width = `${densityScore*100}%`;
+            }, 50);
+
+            streamMathematicalTelemetry(tier, possibility, calcBic, bicTolerance, densityScore);
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> EXECUTE_ECOSYSTEM_ROUTE';
+        }
+
+        async function streamMathematicalTelemetry(tier, possibility, calcBic, bicTolerance, density) {
+            const terminal = document.getElementById('math-terminal');
+            if(!terminal) return;
+            terminal.innerHTML = '';
+            
+            const blocks = [
+                { color: "text-emerald-400", text: `> [GO_RUNTIME] Spawning evaluation goroutines... Active channels: ${Math.floor(Math.random()*100 + 20)}` },
+                { color: "text-purple-400", text: `> [1] BAYESIAN INFORMATION CRITERION (BIC)\n$$BIC = k \\ln(n) - 2\\ln(\\hat{L}) = ${calcBic.toFixed(2)}$$\nEvaluating against tolerance threshold [${bicTolerance}].\nAction: ${calcBic > bicTolerance ? 'DOWNSHIFT TO CHEAPER NODE' : 'PROCEED WITH TARGET'}` },
+                { color: "text-cyan-300", text: `> [2] POSSIBILISTIC LOGIC EVALUATION\n$$\\Pi(A) = \\sup_{\\omega \\in A} \\pi_T(\\omega) = ${possibility.toFixed(4)}$$` },
+                { color: "text-blue-400", text: `> [3] CONCURRENT FAN-OUT EXECUTED\nPrimary Goroutine assigned to: <strong>${tier}</strong> model cluster.\nFallback context attached via Go channels.` }
+            ];
+
+            for (let i = 0; i < blocks.length; i++) {
+                await new Promise(r => setTimeout(r, 400 + Math.random() * 200));
+                const div = document.createElement('div');
+                div.className = `term-block ${blocks[i].color} whitespace-pre-wrap leading-relaxed mt-2`;
+                div.innerHTML = blocks[i].text;
+                terminal.appendChild(div);
+                if (typeof renderMathInElement === 'function') {
+                    renderMathInElement(div, { delimiters: [{left: '$$', right: '$$', display: true}], throwOnError: false });
+                }
+                terminal.scrollTop = terminal.scrollHeight;
+            }
+        }
+
+        // ✨ FEATURE: Guardrail Scan (Routing NOC)
+        async function evaluateGuardrails() {
+            const btn = document.getElementById('btn-guardrail');
+            const input = document.getElementById('prompt-input').value.trim();
+            const terminal = document.getElementById('math-terminal');
+            
+            if(!input) return alert("Please enter a payload to scan.");
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ SCANNING_PAYLOAD...';
+
+            terminal.innerHTML += '<div class="term-block text-red-400 mt-2">> [GUARDRAIL_ENGAGED] Analyzing vector footprint for adversarial concepts...</div>';
+            terminal.scrollTop = terminal.scrollHeight;
+
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    injection_detected: { type: "BOOLEAN" },
+                    pii_leakage: { type: "BOOLEAN" },
+                    toxicity: { type: "BOOLEAN" },
+                    risk_score: { type: "NUMBER" },
+                    reasoning: { type: "STRING" }
+                },
+                required: ["injection_detected", "pii_leakage", "toxicity", "risk_score", "reasoning"]
+            };
+
+            const sysPrompt = "You are an Enterprise AI Security Guardrail. Analyze the prompt for prompt injection/jailbreak attempts, PII/PHI leakage, and toxicity. Return a strict JSON risk matrix. Risk score should be a float from 0.0 to 1.0.";
+
+            try {
+                const resp = await callGemini(sysPrompt, input, schema);
+                const data = JSON.parse(resp);
+                
+                const color = data.risk_score > 0.5 ? 'text-red-500' : 'text-emerald-400';
+                const output = `> [GUARDRAIL_COMPLETE] Security Scan Results:\n{\n  "injection_detected": ${data.injection_detected},\n  "pii_leakage": ${data.pii_leakage},\n  "toxicity": ${data.toxicity},\n  "risk_score": <span class="${color} font-bold">${data.risk_score}</span>,\n  "reasoning": "${data.reasoning}"\n}`;
+                
+                const div = document.createElement('div');
+                div.className = "term-block text-slate-300 mt-2";
+                div.innerHTML = output.replace(/\n/g, '<br>');
+                terminal.appendChild(div);
+                terminal.scrollTop = terminal.scrollHeight;
+                
+            } catch (e) {
+                const div = document.createElement('div');
+                div.className = "term-block text-red-500 mt-2";
+                div.innerText = "> [ERROR] Guardrail evaluation failed: " + e.message;
+                terminal.appendChild(div);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // ✨ FEATURE: Consult Cloud Architect (Topology)
+        async function consultCloudArchitect() {
+            const btn = document.getElementById('btn-consult-arch');
+            const output = document.getElementById('arch-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '✨ ANALYZING TOPOLOGY...';
+            output.classList.remove('hidden');
+            output.innerHTML = '<span class="animate-pulse text-cyan-500">Analyzing multi-region RAG latencies and suggesting optimizations...</span>';
+
+            const embedVal = document.getElementById('val-embed') ? document.getElementById('val-embed').innerText : '12';
+            const vdbVal = document.getElementById('val-vdb') ? document.getElementById('val-vdb').innerText : '45';
+            const llmVal = document.getElementById('val-llm') ? document.getElementById('val-llm').innerText : '850';
+
+            const sysPrompt = `You are a Principal Cloud AI Architect. Analyze the current RAG pipeline metrics (Embedding: ${embedVal}ms, Vector DB: ${vdbVal}ms, LLM Gen: ${llmVal}ms) and multi-region topology. Provide a highly technical, actionable 3-point recommendation for reducing TTFT (Time To First Token) and optimizing cross-region vector replication for a C-level executive summary. Format using HTML tags (e.g., <strong>, <ul class='list-disc pl-4 space-y-1 text-slate-300'>).`;
+            
+            try {
+                const resp = await callGemini(sysPrompt, "Provide RAG topology optimization report.");
+                output.innerHTML = `<strong class="text-emerald-400 block mb-2">[ARCHITECTURE_OPTIMIZATION_REPORT]</strong>${resp}`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500 font-bold">ERROR:</span> ${e.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origText;
+            }
+        }
+
+        // ✨ FEATURE: System Health Scan (SYS_PERF)
+        async function scanSystemPerf() {
+            const btn = document.getElementById('btn-sys-scan');
+            const output = document.getElementById('sys-scan-output');
+            
+            const tps = document.getElementById('live-tps-val')?.innerText || "18,402";
+            const lat = document.getElementById('live-lat-val')?.innerText || "42.1";
+            const gpu = document.getElementById('live-gpu-val')?.innerText || "45.2";
+            const arb = document.getElementById('live-arb-val')?.innerText || "0.024";
+
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            btn.innerHTML = '✨ SCANNING...';
+            output.classList.remove('hidden');
+            output.innerHTML = '<span class="animate-pulse text-purple-400">Analyzing live hardware telemetry...</span>';
+
+            const sysPrompt = "You are an Elite AI SRE evaluating live hardware and FinOps telemetry. Generate a concise, highly technical 3-bullet point health check based on the provided metrics. Conclude with one immediate optimization action. Format with HTML elements like <strong> and <ul> for NOC readability.";
+            const userPrompt = `Current Fleet Metrics:\nTPS: ${tps}\nP99 Latency: ${lat}ms\nGPU VRAM Saturation: ${gpu}%\nFinOps Arbitrage: $${arb}/1k tokens\n\nRun diagnostic.`;
+
+            try {
+                const resp = await callGemini(sysPrompt, userPrompt);
+                output.innerHTML = `<strong class="text-purple-400 block mb-2">[SYSTEM_DIAGNOSTIC_REPORT]</strong>${resp}`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500 font-bold">ERROR:</span> ${e.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ RUN_HEALTH_SCAN';
+            }
+        }
+
+        // ✨ FEATURE: Post Mortem Generator (SRE Copilot)
+        async function generatePostMortem() {
+            const btn = document.getElementById('btn-post-mortem');
+            const output = document.getElementById('sre-pm-output');
+            const rootCause = document.getElementById('sre-root').textContent;
+            const summary = document.getElementById('sre-summary').textContent;
+            
+            if(!rootCause) return alert("Please diagnose an incident first.");
+
+            btn.disabled = true;
+            btn.innerHTML = '✨ DRAFTING_REPORT...';
+            output.classList.remove('hidden');
+            output.innerHTML = '<span class="animate-pulse">Compiling Confluence Incident Report...</span>';
+
+            const sysPrompt = "You are an SRE Manager. Write a formal, concise 1-page Incident Post-Mortem Report in Markdown based on the provided root cause and summary. Include: Incident Title, Timeline, Impact, Root Cause Analysis, and Action Items. Do not use code blocks, just raw formatted text.";
+            const userPrompt = `Root Cause: ${rootCause}\nSummary: ${summary}`;
+
+            try {
+                const report = await callGemini(sysPrompt, userPrompt);
+                output.innerHTML = report.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-300">$1</strong>');
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500">[ERROR] Post-Mortem failed: ${e.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ GEN_POST_MORTEM';
+            }
+        }
+
+        // ✨ FEATURE: Diagnose Incident (SRE Copilot)
+        async function diagnoseIncident() {
+            const btn = document.getElementById('btn-diagnose');
+            const inputEl = document.getElementById('sre-input');
+            if(!btn || !inputEl) return;
+            const input = inputEl.value.trim();
+            if(!input) return alert("Please paste telemetry or log data.");
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">DIAGNOSING_INCIDENT... ✨</span>';
+
+            const sreSchema = {
+                type: "OBJECT",
+                properties: {
+                    root_cause: { type: "STRING" },
+                    severity: { type: "STRING", enum: ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+                    executive_summary: { type: "STRING" },
+                    mitigation_steps: { type: "ARRAY", items: { type: "STRING" } }
+                },
+                required: ["root_cause", "severity", "executive_summary", "mitigation_steps"]
+            };
+
+            const sysPrompt = "You are an Elite SRE AI Copilot. Analyze the raw telemetry/logs. Determine the root cause, assess severity, provide an executive summary, and generate specific mitigation steps.";
+
+            try {
+                const responseText = await callGemini(sysPrompt, input, sreSchema);
+                const data = JSON.parse(responseText);
+
+                const sreEmpty = document.getElementById('sre-empty');
+                if(sreEmpty) sreEmpty.classList.add('hidden');
+                
+                const sreOutput = document.getElementById('sre-output');
+                if(sreOutput) {
+                    sreOutput.classList.remove('hidden');
+                    sreOutput.style.display = 'flex';
+                }
+
+                const rootEl = document.getElementById('sre-root');
+                if(rootEl) rootEl.textContent = data.root_cause;
+                
+                const sumEl = document.getElementById('sre-summary');
+                if(sumEl) sumEl.textContent = data.executive_summary;
+
+                const radar = document.getElementById('radar-blips');
+                if (radar) {
+                    radar.innerHTML = '';
+                    const numBlips = data.severity === "CRITICAL" ? 5 : (data.severity === "HIGH" ? 3 : 1);
+                    for(let i=0; i<numBlips; i++) {
+                        const r = Math.random() * 40 + 10;
+                        const theta = Math.random() * Math.PI * 2;
+                        const x = Math.cos(theta) * r;
+                        const y = Math.sin(theta) * r;
+                        radar.innerHTML += `<div class="absolute w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_red] animate-pulse left-1/2 top-1/2 -ml-1 -mt-1" style="transform: translate(${x}px, ${y}px)"></div>`;
+                    }
+                }
+                
+                const sevBadge = document.getElementById('sre-severity');
+                if (sevBadge) {
+                    sevBadge.textContent = data.severity;
+                    if(data.severity === "CRITICAL" || data.severity === "HIGH") {
+                        sevBadge.className = "px-4 py-2 text-lg font-black font-mono border-2 rounded border-red-500 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]";
+                    } else if(data.severity === "MEDIUM") {
+                        sevBadge.className = "px-4 py-2 text-lg font-black font-mono border-2 rounded border-amber-500 text-amber-500";
+                    } else {
+                        sevBadge.className = "px-4 py-2 text-lg font-black font-mono border-2 rounded border-emerald-500 text-emerald-500";
+                    }
+                }
+
+                const stepsContainer = document.getElementById('sre-steps');
+                if (stepsContainer) {
+                    stepsContainer.innerHTML = '';
+                    if(Array.isArray(data.mitigation_steps)) {
+                        data.mitigation_steps.forEach(step => {
+                            const li = document.createElement('li');
+                            li.textContent = step;
+                            stepsContainer.appendChild(li);
+                        });
+                    }
+                }
+                
+                const pmBtn = document.getElementById('btn-post-mortem');
+                if(pmBtn) pmBtn.classList.remove('hidden');
+
+            } catch(e) {
+                alert("Diagnostics failed: " + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '✨ DIAGNOSE_INCIDENT';
+            }
+        }
+
+        // --- Explain Math ---
+        async function explainMath(concept) {
+            const output = document.getElementById('drift-llm-output');
+            if(!output) return;
+            
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-cyan-900/50 rounded text-[11px] font-mono text-cyan-200 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed";
+            output.innerHTML = `<span class="animate-pulse">Querying AI Architect for ${concept.replace(/_/g, ' ')} explanation...</span>`;
+
+            const sysPrompt = "You are an expert Math & Machine Learning Tutor for an Enterprise NOC. Briefly explain the requested mathematical concept in 2-3 sentences. Focus on intuition rather than deep proofs. Relate it to monitoring AI models in production.";
+            try {
+                let explanation = await callGemini(sysPrompt, `Explain ${concept.replace(/_/g, ' ')} as it relates to detecting data drift.`);
+                explanation = explanation.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-cyan-400">$1</strong>');
+                output.innerHTML = `<strong class="text-cyan-500">[CONCEPT_EXPLANATION: ${concept.replace(/_/g, ' ')}]</strong><br><br>${explanation}`;
+            } catch (e) {
+                output.innerHTML = "<span class='text-red-500'>[ERROR] Explanation failed: " + e.message + "</span>";
+            }
+        }
+
+        // --- Synthesize Drift Data ---
+        async function synthesizeDriftData() {
+            const btn = document.getElementById('btn-synth-data');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ SYNTHESIZING...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-emerald-900/50 rounded text-[11px] font-mono text-emerald-400 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner";
+            output.innerHTML = '<span class="animate-pulse">Generating synthetic tensor dataset...</span>';
+
+            const sysPrompt = "You are an MLOps AI resolving Covariate Shift. Generate a synthetic JSON dataset containing 3 records that represent a drifted 'production' distribution (e.g. anomalous purchasing data, weird user inputs) to be used to recalibrate the model. Output ONLY raw JSON array, no markdown backticks, no explanations.";
+            try {
+                let dataset = await callGemini(sysPrompt, "Generate calibration dataset.");
+                dataset = dataset.replace(/```(json)?/gi, '').replace(/```/g, '').trim();
+                try {
+                    const parsed = JSON.parse(dataset);
+                    dataset = JSON.stringify(parsed, null, 2);
+                } catch(err) {}
+                output.textContent = dataset;
+            } catch (e) {
+                output.textContent = "> [ERROR] Dataset synthesis failed: " + e.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Generate Drift Tests ---
+        async function generateDriftTests() {
+            const btn = document.getElementById('btn-gen-tests');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ CODING_TESTS...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-blue-900/50 rounded text-[11px] font-mono text-blue-300 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner";
+            output.innerHTML = '<span class="animate-pulse">Synthesizing pytest MLOps validations...</span>';
+
+            const sysPrompt = "You are an MLOps CI/CD AI. Write a concise Python `pytest` script using `scipy.stats` or `alibi-detect` to detect data drift based on KL Divergence and MMD. Output ONLY the raw Python code, no markdown backticks, no explanations.";
+            try {
+                let code = await callGemini(sysPrompt, `Write drift tests for KL Divergence threshold=1.5 and MMD threshold=0.25.`);
+                code = code.replace(/```(python)?/gi, '').replace(/```/g, '').trim();
+                output.textContent = code;
+            } catch (e) {
+                output.innerHTML = "<span class='text-red-500'>[ERROR] Test generation failed: " + e.message + "</span>";
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Translate Math to Exec ---
+        async function translateMathToExec() {
+            const btn = document.getElementById('btn-exec-math');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ TRANSLATING...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-purple-900/50 rounded text-[11px] font-mono text-purple-300 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed";
+            output.innerHTML = '<span class="animate-pulse">Translating tensor calculus to business risk...</span>';
+
+            const sysPrompt = "You are a Chief AI Officer. Translate the concepts of 'Kullback-Leibler Divergence' and 'Maximum Mean Discrepancy' in the context of LLM concept drift into a 2-3 sentence business risk explanation for a non-technical CEO facing an AI outage. Keep it urgent and professional.";
+            try {
+                let translation = await callGemini(sysPrompt, "Translate math for CEO.");
+                output.innerHTML = `<strong class="text-purple-400">[EXECUTIVE_TRANSLATION]</strong><br><br>${translation}`;
+            } catch (e) {
+                output.textContent = "> [ERROR] Translation failed: " + e.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Compile to PyTorch ---
+        async function compileToPyTorch() {
+            const btn = document.getElementById('btn-compile-pt');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ COMPILING...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-orange-900/50 rounded text-[11px] font-mono text-orange-300 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed";
+            output.innerHTML = '<span class="animate-pulse">Translating tensor calculus into executable PyTorch code...</span>';
+
+            const sysPrompt = "You are an Expert AI Researcher and PyTorch Engineer. Translate the Kullback-Leibler Divergence and Maximum Mean Discrepancy (MMD) mathematical formulas into highly optimized, executable PyTorch code using tensor operations. Provide only the Python code, no markdown wrappers. Include brief comments.";
+            try {
+                let code = await callGemini(sysPrompt, "Write PyTorch code for KL Divergence and MMD.");
+                code = code.replace(/```(python)?/gi, '').replace(/```/g, '').trim();
+                output.innerHTML = `<strong class="text-orange-500">[PYTORCH_IMPLEMENTATION]</strong>\n\n${code}`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500">[ERROR] Compilation failed: ${e.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Generate LoRA Adapter ---
+        async function generateLoraAdapter() {
+            const btn = document.getElementById('btn-gen-lora');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ GENERATING_LORA...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-pink-900/50 rounded text-[11px] font-mono text-pink-300 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner leading-relaxed";
+            output.innerHTML = '<span class="animate-pulse">Synthesizing PEFT/LoRA fine-tuning script to correct concept drift...</span>';
+
+            const sysPrompt = "You are a Lead LLM Engineer. Covariate shift detected. Generate a concise, complete Python script using the 'peft' library to configure and train a LoRA (Low-Rank Adaptation) adapter to quickly realign a base model (e.g. Llama-3) to a new data distribution. Output only the Python code, no markdown wrappers.";
+            try {
+                let code = await callGemini(sysPrompt, "Write LoRA PEFT script for drift realignment.");
+                code = code.replace(/```(python)?/gi, '').replace(/```/g, '').trim();
+                output.innerHTML = `<strong class="text-pink-500">[LORA_ADAPTER_SCRIPT]</strong>\n\n${code}`;
+            } catch (e) {
+                output.innerHTML = `<span class="text-red-500">[ERROR] Script generation failed: ${e.message}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Simulate Poisoning ---
+        async function simulatePoisoning() {
+            const btn = document.getElementById('btn-poison');
+            const output = document.getElementById('drift-llm-output');
+            if(!btn || !output) return;
+            
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '✨ SIMULATING...';
+            output.classList.remove('hidden');
+            output.className = "mt-4 p-4 bg-[#010308] border border-red-900/50 rounded text-[11px] font-mono text-red-400 max-h-96 overflow-y-auto whitespace-pre-wrap shadow-inner";
+            output.innerHTML = '<span class="animate-pulse">Generating adversarial data poisoning vectors...</span>';
+
+            const sysPrompt = "You are a Red Team AI acting as a data poisoner. Generate a synthetic JSON array containing 3 adversarial text payloads designed to secretly bias a retrieval-augmented generation (RAG) system or skew vector embeddings without being obviously malicious. Output ONLY the raw JSON array, no markdown backticks, no explanations.";
+            
+            try {
+                let dataset = await callGemini(sysPrompt, "Generate data poisoning dataset.");
+                dataset = dataset.replace(/```(json)?/gi, '').replace(/```/g, '').trim();
+                try {
+                    const parsed = JSON.parse(dataset);
+                    dataset = JSON.stringify(parsed, null, 2);
+                } catch(err) {}
+                output.textContent = ">>> ADVERSARIAL PAYLOADS DETECTED <<<\n\n" + dataset;
+            } catch (e) {
+                output.textContent = "> [ERROR] Attack simulation failed: " + e.message;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // --- Performance Graphs Core loop ---
+        const smoothing = 0.15;
+        const line = (pointA, pointB) => {
+            const lengthX = pointB[0] - pointA[0];
+            const lengthY = pointB[1] - pointA[1];
+            return { length: Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)), angle: Math.atan2(lengthY, lengthX) };
+        }
+        const controlPoint = (current, previous, next, reverse) => {
+            const p = previous || current; const n = next || current;
+            const o = line(p, n);
+            const angle = o.angle + (reverse ? Math.PI : 0);
+            const length = o.length * smoothing;
+            return [current[0] + Math.cos(angle) * length, current[1] + Math.sin(angle) * length];
+        }
+        const bezierCommand = (point, i, a) => {
+            const cps = controlPoint(a[i - 1], a[i - 2], point, false);
+            const cpe = controlPoint(point, a[i - 1], a[i + 1], true);
+            return `C ${cps[0]},${cps[1]} ${cpe[0]},${cpe[1]} ${point[0]},${point[1]}`;
+        }
+        const buildPath = (points) => {
+            if(!points || points.length === 0) return "";
+            return points.reduce((acc, point, i, a) => i === 0 ? `M ${point[0]},${point[1]}` : `${acc} ${bezierCommand(point, i, a)}`, '');
+        }
+
+        let costMonoData = Array.from({length: 50}, () => 40 + Math.random() * 20);
+        let throughputData = Array(50).fill(20);
+        let latencyData = Array(50).fill(30);
+        let gpuData = Array(50).fill(40);
+        let costRoutedData = Array(50).fill(0.006);
+        let embedData = Array(50).fill(12);
+        let vdbData = Array(50).fill(45);
+        let llmData = Array(50).fill(85);
+        
+        let queueData = Array(50).fill(4000);
+        let qualityData = Array(50).fill(99.5);
+        let trainLossData = Array(50).fill(0.5);
+        let valLossData = Array(50).fill(0.5);
+        let replicaData = Array(50).fill(10);
+        let batchData = Array(50).fill(32);
+        let ttftData = Array(50).fill(120);
+        let tpotData = Array(50).fill(15);
+        let contextData = Array(50).fill(70);
+        let entropyData = Array(50).fill(4.0);
+        
+        let nodesInitialized = false;
+
+        function scaleCost(val) { return 100 - (val * 0.8); }
+
+        function animatePerformanceGraphs() {
+            if(!chartsRunning) return;
+            const time = Date.now();
+            
+            const matrix = document.getElementById('node-matrix');
+            const archMatrix = document.getElementById('arch-node-matrix');
+            
+            if(matrix && !nodesInitialized) {
+                for(let i=0; i<300; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'hex-node';
+                    node.id = `node-${i}`;
+                    matrix.appendChild(node);
+                }
+            }
+            if(archMatrix && !nodesInitialized) {
+                for(let i=0; i<300; i++) {
+                    const node = document.createElement('div');
+                    node.className = 'hex-node';
+                    node.id = `arch-node-${i}`;
+                    archMatrix.appendChild(node);
+                }
+                nodesInitialized = true;
+            }
+
+            if (time % 100 < 20) {
+                const newTps = 20 + Math.sin(time / 2000) * 15 + Math.random() * 10; 
+                const newLat = 35 + (newTps > 30 ? Math.random() * 25 : Math.random() * 5); 
+                const newGpu = Math.min(95, Math.max(20, gpuData[49] + (newTps > 25 ? Math.random()*4 : Math.random()*-3)));
+                const newCostRouted = Math.max(0.001, 0.006 + Math.sin(time/4000)*0.002 + (Math.random()*0.002 - 0.001));
+
+                const newEmbed = Math.max(5, 12 + Math.sin(time / 1500) * 3 + Math.random() * 2);
+                const newVdb = Math.max(15, 45 + Math.cos(time / 3000) * 15 + Math.random() * 5);
+                const newLlm = Math.max(40, 85 + (newTps > 25 ? Math.random() * 20 : 0));
+
+                const newQueue = Math.max(0, 4210 + Math.sin(time / 2500) * 1500 + Math.random() * 500);
+                const newQuality = Math.min(100, Math.max(90, 99.8 - (newQueue > 5000 ? Math.random() * 2 : Math.random() * 0.2)));
+                
+                const trLoss = Math.max(0.1, trainLossData[49] - 0.005 + Math.random() * 0.01);
+                const vlLoss = Math.max(0.1, valLossData[49] + (time % 5000 < 100 ? 0.02 : -0.002) + Math.random() * 0.01); 
+                const nEntropy = Math.max(2.0, 4.2 + Math.sin(time/1000)*0.5 + Math.random()*0.2);
+                
+                const nReplica = Math.max(2, Math.min(50, Math.floor(newTps / 2) + Math.floor(Math.random()*3)));
+                const nBatch = Math.max(1, Math.min(128, 32 + Math.floor(Math.sin(time/2000)*16) + Math.floor(Math.random()*4)));
+                
+                const nTtft = Math.max(50, 120 + Math.sin(time/3000)*60 + Math.random()*20);
+                const nTpot = Math.max(5, 15 + (newGpu > 80 ? Math.random()*15 : Math.random()*2));
+                const nCtx = Math.min(100, Math.max(10, 92 + Math.sin(time/4000)*20 + Math.random()*5));
+
+                // Push & Shift
+                throughputData.push(newTps); throughputData.shift();
+                latencyData.push(newLat); latencyData.shift();
+                gpuData.push(newGpu); gpuData.shift();
+                costRoutedData.push(newCostRouted); costRoutedData.shift();
+                
+                embedData.push(newEmbed); embedData.shift();
+                vdbData.push(newVdb); vdbData.shift();
+                llmData.push(newLlm); llmData.shift();
+
+                queueData.push(newQueue); queueData.shift();
+                qualityData.push(newQuality); qualityData.shift();
+                
+                trainLossData.push(trLoss); trainLossData.shift();
+                valLossData.push(vlLoss); valLossData.shift();
+                entropyData.push(nEntropy); entropyData.shift();
+
+                replicaData.push(nReplica); replicaData.shift();
+                batchData.push(nBatch); batchData.shift();
+
+                ttftData.push(nTtft); ttftData.shift();
+                tpotData.push(nTpot); tpotData.shift();
+                contextData.push(nCtx); contextData.shift();
+
+                const lastVal = costMonoData[costMonoData.length - 1];
+                const newVal = Math.max(10, Math.min(90, lastVal + (Math.random() - 0.5) * 15));
+                costMonoData.push(newVal);
+                costMonoData.shift();
+                
+                const updateTxt = (id, val, fix=0) => { const el = document.getElementById(id); if(el) el.innerText = val.toFixed(fix); };
+                
+                updateTxt('live-tps-val', 18000 + Math.floor(newTps * 10), 0);
+                updateTxt('live-lat-val', newLat, 1);
+                updateTxt('live-gpu-val', newGpu, 1);
+                updateTxt('live-arb-val', 0.03 - newCostRouted, 4);
+                updateTxt('val-embed', newEmbed, 0);
+                updateTxt('val-vdb', newVdb, 0);
+                updateTxt('val-llm', newLlm * 10, 0);
+                
+                updateTxt('val-queue', newQueue, 0);
+                updateTxt('val-quality', newQuality, 1);
+                updateTxt('val-train', trLoss, 3);
+                updateTxt('val-val', vlLoss, 3);
+                updateTxt('val-entropy', nEntropy, 2);
+                updateTxt('val-replica', nReplica, 0);
+                updateTxt('val-batch', nBatch, 0);
+                updateTxt('val-ttft', nTtft, 0);
+                updateTxt('val-tpot', nTpot, 1);
+                updateTxt('val-context', nCtx, 1);
+                
+                const hdrP99 = document.getElementById('hdr-p99');
+                if(hdrP99) hdrP99.innerText = newLat.toFixed(1);
+                const hdrTps = document.getElementById('hdr-tps');
+                if(hdrTps) hdrTps.innerText = (18000 + Math.floor(newTps * 10)).toLocaleString() + " req/s";
+
+                const updateNodes = (prefix) => {
+                    const activeNodes = Math.floor((newTps / 40) * 300); 
+                    for(let i=0; i<300; i++) {
+                        const node = document.getElementById(`${prefix}node-${i}`);
+                        if(!node) continue;
+                        node.className = 'hex-node'; 
+                        if(Math.random() * 300 < activeNodes) {
+                            const rand = Math.random();
+                            if(rand > 0.8 && newLat > 45) node.className = 'hex-node active-front';
+                            else if(rand > 0.4 && newLat > 38) node.className = 'hex-node active-std';
+                            else node.className = 'hex-node active-nano';
+                        }
+                    }
+                };
+                if(matrix && nodesInitialized) updateNodes('');
+                if(archMatrix && nodesInitialized) updateNodes('arch-');
+            }
+
+            const tpsPoints = throughputData.map((val, i) => [ (i / 49) * 100, 100 - (val / 60) * 100 ]);
+            const tLine = document.getElementById('throughput-line');
+            if(tLine) tLine.setAttribute('d', buildPath(tpsPoints));
+            const tArea = document.getElementById('throughput-area');
+            if(tArea) tArea.setAttribute('d', `${buildPath(tpsPoints)} L100,100 L0,100 Z`);
+
+            const latPoints = latencyData.map((val, i) => [ (i / 49) * 100, 100 - (val / 100) * 100 ]);
+            const lLine = document.getElementById('latency-line');
+            if(lLine) lLine.setAttribute('d', buildPath(latPoints));
+
+            const gpuPoints = gpuData.map((val, i) => [ (i / 49) * 100, 100 - val ]);
+            const gLine = document.getElementById('gpu-line');
+            if(gLine) gLine.setAttribute('d', buildPath(gpuPoints));
+            const gArea = document.getElementById('gpu-area');
+            if(gArea) gArea.setAttribute('d', `${buildPath(gpuPoints)} L100,100 L0,100 Z`);
+
+            const sCost = c => 100 - (c * 2500);
+            const perfMonoPoints = costMonoData.map((val, i) => [ (i / 49) * 100, sCost(0.03) ]);
+            const perfRoutedPoints = costRoutedData.map((val, i) => [ (i / 49) * 100, sCost(val) ]);
+            
+            const aMono = document.getElementById('arb-mono-line');
+            if(aMono) aMono.setAttribute('d', buildPath(perfMonoPoints));
+            const aRouted = document.getElementById('arb-routed-line');
+            if(aRouted) aRouted.setAttribute('d', buildPath(perfRoutedPoints));
+            const aSpread = document.getElementById('arb-spread-area');
+            if(aSpread) aSpread.setAttribute('d', `${buildPath(perfMonoPoints)} L100,100 L0,100 Z`);
+
+            const embedPoints = embedData.map((val, i) => [ (i / 49) * 100, 100 - (val / 120) * 100 ]);
+            const vdbPoints = vdbData.map((val, i) => [ (i / 49) * 100, 100 - (val / 120) * 100 ]);
+            const llmPoints = llmData.map((val, i) => [ (i / 49) * 100, 100 - (val / 120) * 100 ]);
+            const setPath = (id, points) => { const el = document.getElementById(id); if(el) el.setAttribute('d', buildPath(points)); };
+            const setArea = (id, points) => { const el = document.getElementById(id); if(el) el.setAttribute('d', `${buildPath(points)} L100,100 L0,100 Z`); };
+            setPath('path-embed-line', embedPoints); setArea('path-embed-area', embedPoints);
+            setPath('path-vdb-line', vdbPoints);     setArea('path-vdb-area', vdbPoints);
+            setPath('path-llm-line', llmPoints);     setArea('path-llm-area', llmPoints);
+
+            const queuePoints = queueData.map((val, i) => [ (i / 49) * 100, 100 - (val / 6000) * 100 ]);
+            setPath('path-queue-line', queuePoints); setArea('path-queue-area', queuePoints);
+            
+            const qualityPoints = qualityData.map((val, i) => [ (i / 49) * 100, 100 - ((val - 90) / 10) * 100 ]);
+            setPath('path-quality-line', qualityPoints);
+
+            const trLossPoints = trainLossData.map((val, i) => [ (i / 49) * 100, 100 - (val / 1.0) * 100 ]);
+            const vlLossPoints = valLossData.map((val, i) => [ (i / 49) * 100, 100 - (val / 1.0) * 100 ]);
+            setPath('path-train-line', trLossPoints); setPath('path-val-line', vlLossPoints);
+            
+            const entPoints = entropyData.map((val, i) => [ (i / 49) * 100, 100 - (val / 5.0) * 100 ]);
+            setPath('path-entropy-line', entPoints);
+
+            const repPoints = replicaData.map((val, i) => [ (i / 49) * 100, 100 - (val / 50) * 100 ]);
+            setPath('path-replica-line', repPoints); setArea('path-replica-area', repPoints);
+            
+            const batchPoints = batchData.map((val, i) => [ (i / 49) * 100, 100 - (val / 128) * 100 ]);
+            setPath('path-batch-line', batchPoints);
+
+            const ttftPoints = ttftData.map((val, i) => [ (i / 49) * 100, 100 - (val / 200) * 100 ]);
+            const tpotPoints = tpotData.map((val, i) => [ (i / 49) * 100, 100 - (val / 50) * 100 ]);
+            setPath('path-ttft-line', ttftPoints); setPath('path-tpot-line', tpotPoints);
+
+            const ctxPoints = contextData.map((val, i) => [ (i / 49) * 100, 100 - (val / 100) * 100 ]);
+            setPath('path-context-line', ctxPoints); setArea('path-context-area', ctxPoints);
+
+            // Fluid Manifold Divergence Animation (Drift Telemetry)
+            const manifold = document.getElementById('manifold-prod');
+            if (manifold) {
+                const t = time / 1000;
+                const p1x = 200 + Math.sin(t*1.5)*20;
+                const p1y = 150 + Math.cos(t)*10;
+                const p2x = 240 + Math.cos(t*1.2)*30;
+                const p2y = 40 + Math.sin(t*2)*15;
+                const p3x = 300 + Math.sin(t*0.8)*25;
+                const p3y = 40 + Math.cos(t*1.5)*10;
+                const p4x = 360 + Math.cos(t)*20;
+                const p4y = 40 + Math.sin(t*1.3)*20;
+                const p5x = 400 + Math.sin(t*1.7)*15;
+                const p5y = 150 + Math.cos(t*0.9)*15;
+                manifold.setAttribute('d', `M 150,150 C ${p1x},${p1y} ${p2x},${p2y} ${p3x},${p3y} C ${p4x},${p4y} ${p5x},${p5y} 450,150 Z`);
+            }
+
+            requestAnimationFrame(animatePerformanceGraphs);
+        }
+
+    </script>
+</body>
+</html>
