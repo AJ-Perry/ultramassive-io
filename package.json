@@ -1,0 +1,14 @@
+{
+  "name": "ethel-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "functions-framework --target=ethelChat"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.4.2",
+    "@google/generative-ai": "^0.21.0",
+    "cors": "^2.8.5"
+  }
+}
