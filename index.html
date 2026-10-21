@@ -3,928 +3,701 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UltraMassive.ML // Autotelic Routing Engine (A.R.E.)</title>
-<meta name="description" content="A.R.E. — the Autotelic Routing Engine. Route every request to the cheapest tier that can answer it. Relational-hypergraph featurization, possibility-calibrated tier selection, carbon-aware scheduling. UEI M56HEXXMJC47, CAGE 22QR2.">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0b0f'/%3E%3Ccircle cx='32' cy='32' r='26' stroke='%238b95a5' stroke-width='1.2' fill='none' opacity='.4'/%3E%3Cpath d='M32 10 L50 46 L14 46 Z' stroke='%238ea3ff' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='10' r='4' fill='%238ea3ff'/%3E%3Ccircle cx='14' cy='46' r='4' fill='%235fbf78'/%3E%3Ccircle cx='50' cy='46' r='4' fill='%23e79a3c'/%3E%3C/svg%3E">
+<title>UltraMassive.ML // A.R.E. Decision Layer</title>
+<meta name="description" content="The Autotelic Routing Engine. Every inference request becomes a routed, scored, and attested decision. Interactive decision seal, sovereign routing, egress-commit ledger.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23f1f0ea'/%3E%3Ccircle cx='32' cy='32' r='28' stroke='%2359626f' stroke-width='1.2' fill='none' opacity='.4'/%3E%3Cpath d='M32 10 L50 46 L14 46 Z' stroke='%232c37a6' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='10' r='3.8' fill='%232c37a6'/%3E%3Ccircle cx='14' cy='46' r='3.8' fill='%233f7d4e'/%3E%3Ccircle cx='50' cy='46' r='3.8' fill='%23bd6208'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
- --paper:#f1f0ea;--paper2:#e8e6dd;--card:#f7f6f1;--ink:#15161a;--ink2:#464a53;--ink3:#848893;
- --rule:#dad8ce;--rule2:#c7c5b8;--link:#2c37a6;--steel:#59626f;--ok:#3f7d4e;--alert:#a83a2c;
- /* A.R.E. site accent = BLUE (decision/reasoning) */
- --acc:#2c37a6;--acc-soft:rgba(44,55,166,.12);--warn:#bd6208;
- --grid:#e6e4da;--gridb:#dbd9cd;--mark:#eceadf;--glow:rgba(44,55,166,.10);--blend:multiply;--noise:.03;
- --sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;--serif:"Instrument Serif",Georgia,serif;--measure:52rem;
- /* shared tri-color logo palette */
- --um-green:#3f7d4e;--um-blue:#2c37a6;--um-orange:#bd6208;--um-frame:#59626f;--um-bar:#848893;
+  --paper:#f1f0ea; --paper2:#e8e6dd; --card:#f7f6f1;
+  --ink:#15161a; --ink2:#464a53; --ink3:#848893;
+  --rule:#dad8ce; --rule2:#c7c5b8;
+  --link:#2c37a6; --link-l:#8ea3ff;
+  --green:#3f7d4e; --green-l:#5fbf78;
+  --amber:#bd6208; --orange-l:#e79a3c;
+  --steel:#59626f; --ok:#3f7d4e; --alert:#a83a2c;
+  --grid:#e6e4da; --gridb:#dbd9cd; --mark:#eceadf;
+  --glow:rgba(44,55,166,.09); --blend:multiply; --noise:.03;
+  --sans:"Inter",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --serif:"Instrument Serif",Georgia,serif;
+  --measure:60rem;
 }
 html[data-theme="dark"]{
- --paper:#0d0e12;--paper2:#14161c;--card:#171922;--ink:#eef0f5;--ink2:#a8aeba;--ink3:#6c7481;
- --rule:#23272f;--rule2:#2f3540;--link:#8ea3ff;--steel:#8b95a5;--ok:#5fbf78;--alert:#ff7a63;
- --acc:#8ea3ff;--acc-soft:rgba(142,163,255,.16);--warn:#e79a3c;
- --grid:#171a20;--gridb:#1e222a;--mark:#1b1e27;--glow:rgba(142,163,255,.16);--blend:screen;--noise:.05;
- --um-green:#5fbf78;--um-blue:#8ea3ff;--um-orange:#e79a3c;--um-frame:#8b95a5;--um-bar:#6c7481;
+  --paper:#0d0e12; --paper2:#14161c; --card:#171922;
+  --ink:#eef0f5; --ink2:#a8aeba; --ink3:#6c7481;
+  --rule:#23272f; --rule2:#2f3540;
+  --link:#8ea3ff; --link-l:#c0d4ff;
+  --green:#5fbf78; --green-l:#9cd6a8;
+  --amber:#e79a3c; --orange-l:#f4b96b;
+  --steel:#8b95a5; --ok:#5fbf78; --alert:#ff7a63;
+  --grid:#171a20; --gridb:#1e222a; --mark:#1b1e27;
+  --glow:rgba(142,163,255,.13); --blend:screen; --noise:.05;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;
- transition:background .5s ease,color .5s ease;
- background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--gridb) 1px,transparent 1px),linear-gradient(90deg,var(--gridb) 1px,transparent 1px);
- background-size:26px 26px,26px 26px,130px 130px,130px 130px;background-position:-1px -1px;background-attachment:fixed}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;transition:background .5s,color .5s;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--gridb) 1px,transparent 1px),linear-gradient(90deg,var(--gridb) 1px,transparent 1px);
+  background-size:26px 26px,26px 26px,130px 130px,130px 130px;background-position:-1px -1px;background-attachment:fixed}
 .noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:var(--noise);mix-blend-mode:var(--blend);
- background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 a{color:var(--link);text-decoration:none}a:hover{text-decoration:underline;text-underline-offset:3px}
 ::selection{background:var(--glow)}
 .wrap{max-width:var(--measure);margin:0 auto;padding:0 26px;position:relative;z-index:2}
 .mono{font-family:var(--mono)}
 
-.progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:120;background:transparent}
-.progress i{display:block;height:100%;width:0;background:var(--acc);box-shadow:0 0 10px var(--acc)}
-
-/* status bar */
 .statusbar{border-bottom:1px solid var(--rule);background:var(--paper2);position:relative;z-index:60}
 .statusbar .wrap{display:flex;align-items:center;gap:12px;padding:7px 26px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);letter-spacing:.02em;flex-wrap:wrap}
-.sdot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:umpulse 2.4s infinite}
-.ssep{color:var(--ink3)}.statusbar b{color:var(--ink)}.statusbar a{color:var(--ink2)}
-.clock{font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:.01em}
-.sync{font-family:var(--mono);font-size:9px;letter-spacing:.12em;padding:1px 6px;border-radius:4px;border:1px solid var(--rule2);color:var(--ink3)}
-.sync.ok{color:var(--ok);border-color:var(--ok)}.sync.loc{color:var(--ink3)}
-.sync.warn{color:var(--warn);border-color:var(--warn)}
-.statusbar .right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--link)}
+.ssep{color:var(--ink3)}.statusbar b{color:var(--ink)}
+.clock{font-variant-numeric:tabular-nums;color:var(--ink)}
+.sync{font-family:var(--mono);font-size:9px;letter-spacing:.12em;padding:1px 6px;border-radius:4px;border:1px solid var(--rule2);color:var(--link)}
+.statusbar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
 
-/* nav */
-.nav{position:sticky;top:0;z-index:55;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.nav{position:sticky;top:0;z-index:55;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 26px;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-family:var(--mono);font-size:14px;font-weight:700;text-decoration:none}
+.brand:hover{text-decoration:none}
+.brand-mark{width:38px;height:38px;flex:none}
+.brand-mark svg{width:100%;height:100%}
+.brand .pn{display:block;font-weight:400;color:var(--ink3);font-size:10px;letter-spacing:.08em;margin-top:2px}
 .navwrap{display:flex;align-items:center;gap:8px}
 .navlinks{display:flex;gap:2px;align-items:center;position:relative;flex-wrap:wrap}
-.navlinks a{font-family:var(--mono);font-size:12.5px;color:var(--ink2);letter-spacing:.01em;padding:7px 11px;border-radius:7px;position:relative;z-index:1;transition:color .25s;cursor:pointer}
-.navlinks a:hover,.navlinks a.active{color:var(--ink);text-decoration:none}
-.navind{position:absolute;bottom:2px;height:2px;background:var(--acc);border-radius:2px;transition:left .3s cubic-bezier(.4,0,.2,1),width .3s cubic-bezier(.4,0,.2,1);z-index:0;opacity:0}
+.navlinks a{font-family:var(--mono);font-size:12px;color:var(--ink2);padding:7px 10px;border-radius:7px;position:relative;z-index:1;transition:color .25s;cursor:pointer;text-decoration:none}
+.navlinks a:hover,.navlinks a.active{color:var(--ink)}
+.navind{position:absolute;bottom:2px;height:2px;background:var(--link);border-radius:2px;transition:left .3s,width .3s;opacity:0}
+.ecosys{display:flex;gap:4px;font-family:var(--mono);font-size:10px}
+.ecosys a{color:var(--ink3);border:1px solid var(--rule2);border-radius:5px;padding:3px 8px;display:flex;align-items:center;gap:5px;text-decoration:none}
+.ecosys a:hover{border-color:var(--ink);color:var(--ink)}
+.ecosys .ping{width:5px;height:5px;border-radius:50%}
 .iconbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink2);border:1px solid var(--rule2);border-radius:7px;padding:6px 9px;background:var(--card);cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:.2s}
-.iconbtn:hover{border-color:var(--acc);color:var(--acc)}
+.iconbtn:hover{border-color:var(--link);color:var(--link)}
 .iconbtn svg{width:14px;height:14px}
 .burger{display:none}
-
-/* logo lockup */
-.um-logo{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
-.um-logo:hover{text-decoration:none}
-.um-logo-mark{flex:none;position:relative;display:block}
-.um-logo-mark svg{display:block;width:100%;height:100%}
-.um-logo-txt{display:flex;flex-direction:column;line-height:1}
-.um-logo-name{font-family:var(--mono);font-weight:700;color:var(--ink);letter-spacing:-.01em;font-size:15px}
-.um-logo-sub{font-family:var(--mono);font-weight:400;color:var(--ink3);font-size:9.5px;letter-spacing:.12em;margin-top:3px;text-transform:uppercase}
-.um-logo-md .um-logo-mark{width:40px;height:40px}
 
 .bracket{position:relative}
 .bracket::before,.bracket::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none}
 .bracket::before{top:-1px;left:-1px;border-top:2px solid var(--steel);border-left:2px solid var(--steel)}
 .bracket::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--steel);border-right:2px solid var(--steel)}
 
-/* hero */
-.hero-lockup{display:flex;align-items:center;gap:22px;padding:26px;background:var(--card);border:1px solid var(--rule2);border-radius:10px;margin-bottom:22px;position:relative;overflow:hidden}
-.hero-lockup::before{content:"";position:absolute;inset:0;background:
-  radial-gradient(420px circle at 12% 50%, var(--acc-soft), transparent 62%),
-  radial-gradient(360px circle at 88% 30%, color-mix(in srgb, var(--um-green) 10%, transparent), transparent 60%),
-  radial-gradient(360px circle at 80% 85%, color-mix(in srgb, var(--um-orange) 10%, transparent), transparent 60%);
-  pointer-events:none;opacity:.8}
-.hero-lockup > *{position:relative;z-index:1}
-.hero-lockup .hl-sep{width:1px;align-self:stretch;background:var(--rule2)}
-.hero-lockup .hl-info{flex:1}
-.hero-lockup .hl-eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--ink3);text-transform:uppercase;font-weight:600}
-.hero-lockup .hl-title{font-family:var(--serif);font-size:17px;color:var(--ink);margin-top:3px;line-height:1.3}
-.hero-lockup .hl-title b{color:var(--acc);font-weight:400;font-style:italic}
-
-.memo{padding:60px 0 8px;position:relative}
-.spot{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity .5s;
- background:radial-gradient(420px circle at var(--mx,50%) var(--my,40%),var(--glow),transparent 60%)}
-.memo:hover .spot{opacity:1}
-.memo .wrap,.memo>*{position:relative;z-index:2}
-.memohead{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13px;color:var(--ink2);letter-spacing:.03em;margin-bottom:22px}
-.memohead svg{width:30px;height:30px}
-.memohead .tag{margin-left:auto;font-size:10.5px;color:var(--ink3);border:1px solid var(--rule2);border-radius:5px;padding:3px 8px}
-.memowrap{display:grid;grid-template-columns:1fr auto;gap:34px;align-items:start}
-.fields{margin:0;font-family:var(--mono);font-size:13.5px}
-.fields .row{display:grid;grid-template-columns:86px 1fr;gap:14px;padding:6px 0;border-bottom:1px dotted var(--rule2)}
+/* ═══ HERO SPLIT ═══ */
+.hero{padding:54px 0 20px;position:relative}
+.spot{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .5s;background:radial-gradient(520px circle at var(--mx,72%) var(--my,40%),var(--glow),transparent 62%)}
+.hero:hover .spot{opacity:1}
+.hero .wrap{position:relative;z-index:2}
+.memohead{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:12.5px;color:var(--ink2);letter-spacing:.03em;margin-bottom:20px}
+.memohead svg{width:28px;height:28px;color:var(--link)}
+.memohead .tag{margin-left:auto;font-size:10px;color:var(--ink3);border:1px solid var(--rule2);border-radius:5px;padding:3px 8px}
+.fields{margin:0 0 24px;font-family:var(--mono);font-size:13px;max-width:620px}
+.fields .row{display:grid;grid-template-columns:82px 1fr;gap:14px;padding:6px 0;border-bottom:1px dotted var(--rule2)}
 .fields dt{color:var(--ink3);margin:0}.fields dd{color:var(--ink);margin:0}
-.cursor{display:inline-block;width:7px;height:15px;background:var(--acc);vertical-align:-2px;margin-left:3px;animation:umblink 1.1s steps(2) infinite}
-.mission{font-family:var(--serif);font-size:clamp(32px,5.4vw,58px);line-height:1.04;letter-spacing:-.01em;color:var(--ink);margin:36px 0 0;max-width:20ch}
-.mission em{font-style:italic;color:var(--acc)}
-.herocanvas{position:relative;margin-top:26px;height:240px;border:1px solid var(--rule);background:var(--card);overflow:hidden}
-.herocanvas canvas{position:absolute;inset:0;width:100%;height:100%}
-.herocanvas .hlabel{position:absolute;left:10px;bottom:8px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.06em;z-index:2}
-.herocanvas .hcorner{position:absolute;top:8px;right:10px;font-family:var(--mono);font-size:10px;color:var(--ink3);z-index:2}
+.cursor{display:inline-block;width:7px;height:14px;background:var(--link);vertical-align:-2px;margin-left:3px;animation:blink 1.1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
 
-.prose{padding:30px 0 6px;font-size:16.5px;color:var(--ink)}
-.prose p{margin:0 0 20px;max-width:66ch;color:var(--ink2)}
-.prose b{font-weight:600;color:var(--ink)}
-.prose ol{counter-reset:pr;list-style:none;margin:22px 0;padding:0;max-width:62ch}
-.prose ol li{counter-increment:pr;position:relative;padding:11px 0 11px 46px;border-bottom:1px solid var(--rule);color:var(--ink2)}
-.prose ol li b{color:var(--ink)}
-.prose ol li::before{content:counter(pr,decimal-leading-zero);position:absolute;left:0;top:10px;font-family:var(--mono);font-size:12px;color:var(--acc);border:1px solid var(--rule2);border-radius:5px;padding:2px 6px;background:var(--card)}
-.metricline{font-family:var(--mono);font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--rule2);border-left:3px solid var(--acc);border-radius:6px;padding:14px 16px;margin:8px 0 22px}
-.metricline b{color:var(--link)}
+.hero-split{display:grid;grid-template-columns:1fr 440px;gap:44px;align-items:center;margin-bottom:8px}
+.hero-left .mission{font-family:var(--serif);font-size:clamp(34px,4.8vw,54px);line-height:1.03;letter-spacing:-.015em;margin:0 0 18px;max-width:17ch}
+.hero-left .mission em{font-style:italic;color:var(--steel)}
+.hero-left .lede{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--ink2);line-height:1.5;max-width:44ch;margin:0 0 20px}
+.hero-left .stamp{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.06em;border-top:1px solid var(--rule);padding-top:12px;line-height:1.9}
+.hero-left .stamp b{color:var(--link);font-weight:600}
 
-.sec{padding:52px 0;scroll-margin-top:96px}
-.secmark{display:flex;align-items:baseline;gap:14px;font-family:var(--mono);font-size:13px;color:var(--ink2);letter-spacing:.04em;margin-bottom:9px}
+/* ═══ DECISION SEAL ═══ */
+.seal-wrap{position:relative}
+.seal-svg{display:block;width:100%;max-width:420px;margin:0 auto;overflow:visible}
+.seal-vertex{cursor:pointer;outline:none}
+.seal-vertex .vhalo{transition:.25s;opacity:.15}
+.seal-vertex:hover .vhalo,.seal-vertex:focus .vhalo{opacity:.32}
+.seal-vertex .vdot{transition:.25s}
+.seal-vertex:hover .vdot,.seal-vertex:focus .vdot{stroke-width:4}
+.seal-vertex.flash .vhalo{opacity:.55}
+.seal-vertex text{font-family:var(--mono);font-weight:700;letter-spacing:.08em;pointer-events:none}
+.seal-vertex .vname{font-size:10px;fill:var(--ink)}
+.seal-hub-tier{font-family:var(--mono);font-size:13px;font-weight:700;fill:var(--ink);letter-spacing:.04em}
+.seal-hub-sub{font-family:var(--mono);font-size:8.5px;fill:var(--ink3)}
+.seal-hub-last{font-family:var(--mono);font-size:7.5px;fill:var(--ink3);letter-spacing:.04em}
+
+.seal-caption{text-align:center;font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:14px;line-height:1.6}
+.seal-caption b{color:var(--ink);font-weight:600}
+
+/* ═══ FIGURE ═══ */
+.figure{position:relative;border:1px solid var(--rule);background:var(--card);overflow:hidden;margin-top:22px;border-radius:6px}
+.figure canvas{display:block;width:100%;height:auto}
+.figure .flabel{position:absolute;left:12px;bottom:10px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.05em;z-index:2}
+.figure .fcorner{position:absolute;top:10px;right:12px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);z-index:2;letter-spacing:.06em}
+
+/* ═══ SECTIONS ═══ */
+.sec{padding:50px 0;scroll-margin-top:90px}
+.secmark{display:flex;align-items:baseline;gap:14px;font-family:var(--mono);font-size:12.5px;color:var(--ink2);letter-spacing:.04em;margin-bottom:10px}
 .secmark .id{color:var(--ink3)}.secmark .ttl{color:var(--ink);font-weight:600}
 .secmark::after{content:"";flex:1;height:0;border-top:1px dashed var(--rule2);align-self:center;margin-left:4px}
-.secmark .rev{color:var(--ink3);border:1px solid var(--rule2);border-radius:5px;padding:2px 7px;font-size:10.5px}
-.secnote{color:var(--ink2);max-width:62ch;margin:0 0 22px;font-size:15px}
+.secmark .rev{color:var(--ink3);border:1px solid var(--rule2);border-radius:5px;padding:2px 7px;font-size:10px}
+.secnote{color:var(--ink2);max-width:64ch;margin:0 0 22px;font-size:15px}
 .secnote b{color:var(--ink)}
-
-.entry{padding:22px 0;border-bottom:1px solid var(--rule)}
+.entry{padding:20px 0;border-bottom:1px solid var(--rule)}
 .entry:last-child{border-bottom:0}
 .entry h3{margin:0;font-size:18px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.entry h3 .num{font-family:var(--mono);font-size:12px;color:var(--acc);font-weight:700}
 .entry h3 .pin{font-family:var(--mono);font-size:11px;color:var(--ink3);font-weight:400}
-.entry p{margin:11px 0 0;color:var(--ink2);max-width:68ch;font-size:15.5px}
+.emeta{font-family:var(--mono);font-size:12px;color:var(--ink3);margin-top:4px}
+.entry p{margin:11px 0 0;color:var(--ink2);max-width:68ch;font-size:15px}
 .entry p b{color:var(--ink);font-weight:600}
-.annot{font-family:var(--mono);font-size:12.5px;color:var(--ink2);background:var(--paper2);border:1px solid var(--rule);border-radius:6px;padding:9px 12px;margin-top:12px;overflow-x:auto;line-height:1.7}
+.annot{font-family:var(--mono);font-size:12px;color:var(--ink2);background:var(--paper2);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;margin-top:12px;overflow-x:auto;line-height:1.7}
 .annot b{color:var(--ink)}
-.elinks{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px 16px;font-family:var(--mono);font-size:12.5px}
 .etags{margin-top:11px;display:flex;flex-wrap:wrap;gap:7px}
-.etag{font-family:var(--mono);font-size:11px;color:var(--ink2);border:1px solid var(--rule2);border-radius:5px;padding:3px 8px;background:var(--card)}
+.etag{font-family:var(--mono);font-size:10.5px;color:var(--ink2);border:1px solid var(--rule2);border-radius:5px;padding:3px 8px;background:var(--card)}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--rule2);background:var(--card);overflow:hidden;margin-top:8px}
-.stat{padding:18px;border-right:1px solid var(--rule);position:relative}
-.stat:last-child{border-right:0}
-.stat::before{content:"";position:absolute;top:0;left:0;width:10px;height:10px;border-top:1px solid var(--steel);border-left:1px solid var(--steel)}
-.stat .n{font-family:var(--mono);font-size:26px;color:var(--ink);letter-spacing:-.02em}
-.stat .n .suf{color:var(--acc)}
-.stat .l{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.4}
+/* ═══ TELEMETRY ═══ */
+.tele-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.tele-card{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:16px;position:relative}
+.tele-card::before{content:"";position:absolute;top:0;left:0;width:9px;height:9px;border-top:1px solid var(--steel);border-left:1px solid var(--steel)}
+.tele-card .tl-label{font-family:var(--mono);font-size:9px;color:var(--ink3);letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin-bottom:6px}
+.tele-card .tl-val{font-family:var(--mono);font-size:24px;color:var(--ink);font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.tele-card .tl-val .suf{font-size:12px;color:var(--ink3);font-weight:400;margin-left:2px}
+.tele-card .tl-sub{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:6px}
 
-.tabs{margin-top:8px}
-.tabbar{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding-bottom:10px}
-.tabbtn{font-family:var(--mono);font-size:12.5px;color:var(--ink2);background:var(--card);border:1px solid var(--rule2);border-radius:6px;padding:7px 12px;cursor:pointer;transition:.2s}
-.tabbtn:hover{color:var(--ink);border-color:var(--steel)}
-.tabbtn.active{color:var(--ink);background:var(--mark);border-color:var(--steel);box-shadow:inset 0 -2px 0 var(--acc)}
-.panel{display:none;padding:18px 0}.panel.active{display:block;animation:umfade .4s ease}
+.dist-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.dist-block{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:18px}
+.dist-block h4{margin:0 0 14px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.dbar{margin-bottom:12px}
+.dbar:last-child{margin-bottom:0}
+.dbar .db-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;margin-bottom:5px}
+.dbar .db-top .db-name{color:var(--ink);font-weight:600}
+.dbar .db-top .db-count{color:var(--ink3);font-variant-numeric:tabular-nums}
+.dbar .db-track{height:7px;background:var(--paper2);border-radius:4px;overflow:hidden}
+.dbar .db-fill{height:100%;border-radius:4px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.dispatch-log{max-height:220px;overflow-y:auto;font-family:var(--mono);font-size:10.5px}
+.dispatch-log::-webkit-scrollbar{width:5px}
+.dispatch-log::-webkit-scrollbar-thumb{background:var(--rule2);border-radius:3px}
+.dl-row{display:grid;grid-template-columns:56px 1fr auto;gap:10px;padding:6px 0;border-bottom:1px dotted var(--rule2);align-items:center}
+.dl-row:last-child{border-bottom:0}
+.dl-row .t{color:var(--ink3);font-size:9px;font-variant-numeric:tabular-nums}
+.dl-row .m{color:var(--ink2)}
+.dl-row .m b{color:var(--ink);font-weight:600}
+.dl-row .tier-tag{font-size:8.5px;padding:2px 6px;border-radius:3px;font-weight:700;letter-spacing:.06em}
 
-.code{position:relative;background:#0c0d11;border:1px solid #23262f;border-radius:8px;margin-top:12px;overflow:hidden}
-.code pre{margin:0;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;color:#d7d9e0}
-.code .cbar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #23262f;font-family:var(--mono);font-size:11px;color:#8a8e99}
-.copy{font-family:var(--mono);font-size:11px;color:#c9cbd4;background:#23262f;border:0;border-radius:5px;padding:4px 9px;cursor:pointer}.copy:hover{background:#2e313b}
-
-.btn{font-family:var(--mono);font-size:13px;padding:11px 16px;border:1px solid var(--rule2);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:transform .15s,border-color .2s,color .2s,background .2s}
-.btn:hover{border-color:var(--link);color:var(--link);text-decoration:none;transform:translateY(-1px)}
-.btn.pri{background:var(--acc);color:#fff;border-color:var(--acc)}.btn.pri:hover{transform:translateY(-1px);color:#fff;filter:brightness(1.08)}
-.btn.acc{border-color:var(--acc);color:var(--acc)}.btn.acc:hover{background:var(--acc);color:#fff}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
-
-.widget{border:1px solid var(--rule2);background:var(--card);border-radius:10px;padding:20px;margin-top:8px}
-.widget .wtop{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--ink3);letter-spacing:.05em;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.widget .wtop .sim{color:var(--warn);border:1px solid var(--warn);border-radius:5px;padding:2px 7px}
+/* ═══ WIDGET ═══ */
+.widget{border:1px solid var(--rule2);background:var(--card);border-radius:10px;padding:20px;margin-top:12px}
+.widget .wtop{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ink3);letter-spacing:.05em;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.widget .wtop .sim{color:var(--link);border:1px solid var(--link);border-radius:5px;padding:2px 7px}
 .wgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.ctrl{margin-bottom:16px}
-.ctrl label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:12px;color:var(--ink2);margin-bottom:6px}
+.ctrl{margin-bottom:15px}
+.ctrl label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11.5px;color:var(--ink2);margin-bottom:6px}
 .ctrl label b{color:var(--ink)}
-.ctrl input[type=range]{width:100%;accent-color:var(--acc)}
-.ctrl select{width:100%;font-family:var(--mono);font-size:13px;padding:8px;border:1px solid var(--rule2);border-radius:6px;background:var(--paper);color:var(--ink)}
-.readout{font-family:var(--mono);font-size:13px;color:var(--ink2);line-height:1.8}
+.ctrl input[type=range]{width:100%;accent-color:var(--link)}
+.ctrl select{width:100%;font-family:var(--mono);font-size:12.5px;padding:9px;border:1px solid var(--rule2);border-radius:6px;background:var(--paper);color:var(--ink)}
+.readout{font-family:var(--mono);font-size:12.5px;color:var(--ink2);line-height:1.8}
 .readout b{color:var(--ink)}
-.band{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:600;letter-spacing:.04em;font-family:var(--mono);font-size:11.5px}
+.bandviz{height:22px;background:var(--paper2);border:1px solid var(--rule2);border-radius:5px;position:relative;overflow:hidden;margin-top:14px}
+.bandviz .pi{position:absolute;top:0;bottom:0;left:0;background:color-mix(in srgb,var(--link) 25%,transparent);border-right:1px dashed var(--link);transition:width .35s}
+.bandviz .ni{position:absolute;top:0;bottom:0;left:0;background:color-mix(in srgb,var(--ok) 35%,transparent);transition:width .35s}
+.bandviz .tau{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--link);transition:left .3s}
+.bandviz .tau::after{content:attr(data-l);position:absolute;top:-17px;left:4px;font-family:var(--mono);font-size:9px;color:var(--link);white-space:nowrap}
+.band{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:600;letter-spacing:.04em;font-family:var(--mono);font-size:11px}
 .band.NOVEL{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 40%,transparent)}
-.band.AMBIGUOUS{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent)}
-.band.COMMITTED{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent)}
+.band.AMBIGUOUS{background:color-mix(in srgb,var(--link) 16%,transparent);color:var(--link);border:1px solid color-mix(in srgb,var(--link) 40%,transparent)}
+.band.COMMITTED{background:color-mix(in srgb,var(--amber) 16%,transparent);color:var(--amber);border:1px solid color-mix(in srgb,var(--amber) 40%,transparent)}
+.band.BLOCKED{background:color-mix(in srgb,var(--alert) 14%,transparent);color:var(--alert);border:1px solid color-mix(in srgb,var(--alert) 40%,transparent)}
+.band.IDLE{background:var(--paper2);color:var(--ink3);border:1px solid var(--rule2)}
+.tiergrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.tcard{border:1px solid var(--rule2);background:var(--paper2);border-radius:6px;padding:11px;transition:.2s}
+.tcard.sel{border-color:var(--link);box-shadow:inset 0 0 0 1px var(--link)}
+.tcard .tn{font-family:var(--mono);font-size:11.5px;font-weight:700;color:var(--ink)}
+.tcard .tc{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:3px}
+.tcard .tp{font-family:var(--mono);font-size:10px;color:var(--ink2);margin-top:6px}
 
-.bandviz{height:24px;background:var(--paper2);border:1px solid var(--rule2);border-radius:5px;position:relative;overflow:visible;margin-top:16px}
-.bandviz .pi{position:absolute;top:0;bottom:0;left:0;background:color-mix(in srgb,var(--warn) 24%,transparent);border-right:1px dashed var(--warn);transition:width .4s}
-.bandviz .ni{position:absolute;top:0;bottom:0;left:0;background:color-mix(in srgb,var(--ok) 34%,transparent);transition:width .4s}
-.bandviz .tau{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--acc);transition:left .3s}
-.bandviz .tau::after{content:attr(data-l);position:absolute;top:-18px;left:5px;font-family:var(--mono);font-size:9.5px;color:var(--acc);white-space:nowrap}
+/* ═══ SOVEREIGN ═══ */
+.sov-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;margin-top:14px}
+.sov-controls{border:1px solid var(--rule2);background:var(--card);border-radius:10px;padding:18px}
+.sov-section-label{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--link);font-weight:700;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+.checks{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0 16px}
+.checkrow{display:flex;align-items:flex-start;gap:9px;padding:9px 10px;border:1px solid var(--rule);border-radius:6px;background:var(--paper2);cursor:pointer;transition:.2s}
+.checkrow:hover{border-color:var(--rule2)}
+.checkrow.on{border-color:var(--link);background:color-mix(in srgb,var(--link) 6%,var(--card))}
+.checkrow input{margin-top:3px;accent-color:var(--link);width:14px;height:14px;flex:none;cursor:pointer}
+.checkrow .cr-text{flex:1}
+.checkrow .cr-name{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);line-height:1.4}
+.checkrow .cr-desc{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+.btn{font-family:var(--mono);font-size:12.5px;padding:11px 16px;border:1px solid var(--rule2);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:.18s;text-decoration:none}
+.btn:hover{border-color:var(--link);color:var(--link);transform:translateY(-1px);text-decoration:none}
+.btn.pri{background:var(--link);color:#fff;border-color:var(--link)}
+.btn.pri:hover{color:#fff;filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.full{width:100%;justify-content:center}
+.sov-stage{border:1px solid var(--rule2);background:var(--card);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.sov-stage-head{padding:12px 16px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.05em}
+.sov-stage-head .live{color:var(--link);display:flex;align-items:center;gap:6px}
+.sov-stage-head .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--link)}
+.sov-canvas-wrap{position:relative;flex:1;min-height:300px}
+.sov-canvas-wrap canvas{display:block;width:100%;height:300px}
+.sov-hud{position:absolute;top:10px;left:12px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);line-height:1.8;pointer-events:none}
+.sov-hud b{color:var(--ink)}
+.sov-result{border-top:1px solid var(--rule);padding:14px 16px;background:var(--paper2)}
+.sov-result .res-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.sov-result .res-title{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.sov-result .res-line{font-family:var(--mono);font-size:11.5px;color:var(--ink2);line-height:1.7}
+.sov-result .res-line b{color:var(--ink)}
+.sov-result .res-line .dest{color:var(--link);font-weight:700}
+.alert-box{margin-top:10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--alert) 40%,transparent);border-left:3px solid var(--alert);border-radius:5px;background:color-mix(in srgb,var(--alert) 6%,var(--card));font-family:var(--mono);font-size:10.5px;color:var(--alert);line-height:1.6;display:none}
+.alert-box.show{display:block;animation:fade .3s}
+.alert-box.ok{border-color:color-mix(in srgb,var(--ok) 40%,transparent);border-left-color:var(--ok);background:color-mix(in srgb,var(--ok) 6%,var(--card));color:var(--ok)}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-/* tier cards in simulator */
-.tiergrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.tcard{border:1px solid var(--rule2);background:var(--paper2);border-radius:8px;padding:12px;transition:.25s}
-.tcard.sel{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
-.tcard .tn{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink)}
-.tcard .tc{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-top:3px}
-.tcard .tp{font-family:var(--mono);font-size:10.5px;color:var(--ink2);margin-top:6px}
+.formula{background:var(--paper2);border:1px solid var(--rule);border-left:3px solid var(--link);border-radius:0 6px 6px 0;padding:16px 20px;margin:14px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85;overflow-x:auto}
+.formula .var{color:var(--link);font-weight:600}
+.formula .fn{color:var(--ok);font-weight:600}
+.formula .num{color:var(--amber);font-weight:600}
+.formula .comment{color:var(--ink3);font-style:italic}
 
-/* pipeline */
-.pipeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:16px;position:relative}
-.pstage{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:16px 14px;position:relative;text-align:center;margin:0 4px}
-.pstage .pnum{font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.12em}
-.pstage .ptitle{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink);margin-top:6px;letter-spacing:.03em}
-.pstage .pdesc{font-size:11.5px;color:var(--ink2);margin-top:6px;line-height:1.5}
-.pstage .pdot{width:9px;height:9px;border-radius:50%;background:var(--acc);margin:10px auto 0;box-shadow:0 0 8px var(--acc);animation:umpulse 1.8s infinite}
-.pipeline .pflow{position:absolute;top:50%;left:0;right:0;height:2px;background:repeating-linear-gradient(90deg,var(--rule2) 0 6px,transparent 6px 12px);z-index:0}
-.pstage{position:relative;z-index:1}
+.inspect-wrap{position:relative}
+.inspect-box{position:absolute;bottom:12px;right:12px;width:250px;background:var(--paper);border:1px solid var(--rule2);border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:10.5px;color:var(--ink2);line-height:1.65;box-shadow:0 6px 24px rgba(0,0,0,.07);display:none;z-index:4}
+.inspect-box.open{display:block;animation:fade .25s}
+.inspect-box h5{margin:0 0 8px;font-size:11.5px;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.inspect-box h5 button{background:none;border:0;color:var(--ink3);cursor:pointer;font-size:15px;font-family:var(--mono);line-height:1;padding:0}
+.inspect-box .ir{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted var(--rule2)}
+.inspect-box .ir:last-child{border-bottom:0}
+.inspect-box .ir b{color:var(--ink)}
 
-/* sharding viz */
-.shardviz{position:relative;border:1px solid var(--rule);border-radius:9px;background:var(--paper2);overflow:hidden;margin-top:10px}
-.shardviz svg{display:block;width:100%;height:auto}
-.shard-hud{position:absolute;left:12px;top:10px;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.05em;line-height:1.8;pointer-events:none;z-index:3}
-.shard-hud b{color:var(--ink)}
-.shard-hud .ok{color:var(--ok)}.shard-hud .acc{color:var(--acc)}
-.shardctl{padding:12px 14px;border-top:1px solid var(--rule);background:var(--card);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.feed{border:1px solid var(--rule2);background:var(--card);border-radius:8px;overflow:hidden;margin-top:12px}
+.feed-head{padding:12px 16px;border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.05em}
+.feed-head .live{color:var(--link);display:flex;align-items:center;gap:6px}
+.feed-head .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--link)}
+.feed-body{max-height:340px;overflow-y:auto;font-family:var(--mono);font-size:11px}
+.feed-body::-webkit-scrollbar{width:6px}
+.feed-body::-webkit-scrollbar-thumb{background:var(--rule2);border-radius:3px}
+.feed-row{padding:10px 16px;border-bottom:1px dotted var(--rule2);display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:center}
+.feed-row:last-child{border-bottom:0}
+.feed-row .time{color:var(--ink3);font-size:9.5px;font-variant-numeric:tabular-nums}
+.feed-row .msg{color:var(--ink2);line-height:1.5}
+.feed-row .msg b{color:var(--ink);font-weight:600}
+.feed-row .status{font-size:8.5px;padding:2px 6px;border-radius:4px;font-weight:700;letter-spacing:.08em;white-space:nowrap}
+.feed-row .status.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+.feed-row .status.blocked{background:color-mix(in srgb,var(--alert) 15%,transparent);color:var(--alert)}
+.feed-row .status.held{background:color-mix(in srgb,var(--amber) 15%,transparent);color:var(--amber)}
 
-/* carbon matrix */
-.regions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
-.rcard{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:13px;position:relative;transition:.3s}
-.rcard.edge{border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
-.rcard.hot{box-shadow:inset 0 0 0 1px var(--acc)}
-.rcard .rn{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.03em}
-.rcard .rt{font-family:var(--mono);font-size:9px;letter-spacing:.11em;color:var(--ink3);margin-top:2px}
-.rcard .rt.edge{color:var(--ok)}
-.rcard .rrow{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink2);margin-top:8px}
-.rcard .sharebar{height:6px;background:var(--paper2);border:1px solid var(--rule);border-radius:4px;margin-top:7px;overflow:hidden}
-.rcard .sharefill{height:100%;border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
-.traffic-stack{display:flex;height:26px;border:1px solid var(--rule2);border-radius:6px;overflow:hidden;margin-top:14px}
-.traffic-stack .tseg{height:100%;transition:width .5s;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:9.5px;color:#fff;font-weight:700;letter-spacing:.04em;overflow:hidden;white-space:nowrap}
-.callout{border:1px solid color-mix(in srgb,var(--acc) 30%,transparent);border-left:3px solid var(--acc);background:color-mix(in srgb,var(--acc) 5%,var(--card));border-radius:6px;padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--ink2);line-height:1.7;margin-top:16px}
-.callout b{color:var(--ink)}
-.packetdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:6px;animation:umpulse 1.4s infinite}
+.tiermatrix{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.tier{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:18px;position:relative;overflow:hidden}
+.tier::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--tcol)}
+.tier .tnum{font-family:var(--mono);font-size:9px;color:var(--tcol);letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.tier h4{margin:0 0 8px;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.tier p{margin:8px 0 0;color:var(--ink2);font-size:12.5px;line-height:1.6}
+.tier .tspecs{margin-top:12px;font-family:var(--mono);font-size:10.5px;color:var(--ink2);line-height:1.75}
+.tier .tspecs b{color:var(--ink);font-weight:600}
 
-/* dissent flow */
-.dflow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:stretch;margin-top:12px}
-.dnode{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:13px;text-align:center}
-.dnode .dl{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;color:var(--ink3)}
-.dnode .dv{font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:600;margin-top:6px;line-height:1.35}
-.dnode .dm{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:6px}
-.dnode.hot{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 7%,var(--card))}
-.dnode.hot .dv{color:var(--warn)}
-.dnode.okn{border-color:color-mix(in srgb,var(--ok) 45%,transparent);background:color-mix(in srgb,var(--ok) 7%,var(--card))}
-.dnode.okn .dv{color:var(--ok)}
-.darrow{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:17px;color:var(--ink3)}
-
-/* egress table */
-.etable{width:100%;border-collapse:collapse;margin-top:10px;font-family:var(--mono);font-size:11.5px}
-.etable th{text-align:left;font-size:9.5px;letter-spacing:.11em;color:var(--ink3);font-weight:400;padding:8px 10px;border-bottom:1px solid var(--rule2);text-transform:uppercase}
-.etable td{padding:9px 10px;border-bottom:1px solid var(--rule);color:var(--ink2);vertical-align:top}
-.etable tr:hover td{background:var(--paper2)}
-.etable td b{color:var(--ink);font-weight:600}
-.etable .h{color:var(--warn)}
-.etable .st{font-size:9px;letter-spacing:.1em;padding:2px 6px;border-radius:4px;white-space:nowrap}
-.etable .st.allow{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 40%,transparent)}
-.etable .st.deny{background:color-mix(in srgb,var(--alert) 13%,transparent);color:var(--alert);border:1px solid color-mix(in srgb,var(--alert) 40%,transparent)}
-.etable .st.audit{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent)}
-
-/* ecosystem layermarks */
-.layermarks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 4px}
-.lm{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:16px 14px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
-.lm::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s;pointer-events:none;
- background:radial-gradient(120px circle at 50% 40%, var(--acc-soft), transparent 65%)}
-.lm:hover::before{opacity:1}
-.lm:hover{border-color:var(--acc);transform:translateY(-2px)}
-.lm.you{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
-.lm .you-badge{position:absolute;top:8px;right:8px;font-family:var(--mono);font-size:8px;letter-spacing:.1em;background:var(--acc);color:#fff;padding:2px 6px;border-radius:4px;font-weight:700}
-.lm > *{position:relative;z-index:1}
-.lm .lm-logo{width:50px;height:50px;margin:0 auto 10px;display:block}
-.lm .lm-logo svg{width:100%;height:100%}
-.lm .lmn{font-family:var(--mono);font-size:11px;color:var(--ink);font-weight:600;letter-spacing:.03em}
-.lm .lmu{font-family:var(--mono);font-size:9.5px;color:var(--ink3);margin-top:3px;word-break:break-all}
-.lm .lm-color-bar{display:flex;gap:3px;justify-content:center;margin-top:8px}
-.lm .lm-color-bar span{width:14px;height:3px;border-radius:1px}
-.lm .c-green{background:var(--um-green)}
-.lm .c-blue{background:var(--um-blue)}
-.lm .c-orange{background:var(--um-orange)}
-
-.color-legend{display:inline-flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--ink2);margin:8px 0 4px;letter-spacing:.03em}
-.color-legend .cl-item{display:inline-flex;align-items:center;gap:6px}
-.color-legend .cl-swatch{width:10px;height:10px;border-radius:2px;flex:none}
-.color-legend .cl-green{background:var(--um-green)}
-.color-legend .cl-blue{background:var(--um-blue)}
-.color-legend .cl-orange{background:var(--um-orange)}
-.color-legend .cl-frame{background:var(--um-frame)}
-
-/* pricing */
-.plans{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-.plan{border:1px solid var(--rule2);background:var(--card);border-radius:8px;padding:16px;position:relative}
-.plan.pop{border-color:var(--acc);box-shadow:inset 0 0 0 1px var(--acc)}
-.plan .pop-tag{position:absolute;top:-9px;right:12px;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;background:var(--acc);color:#fff;padding:2px 7px;border-radius:4px;font-weight:700}
-.plan .pn{font-family:var(--mono);font-size:13.5px;font-weight:700;color:var(--ink)}
-.plan .pp{font-family:var(--mono);font-size:21px;color:var(--ink);margin-top:6px;letter-spacing:-.02em;font-weight:700}
-.plan .pp small{font-size:10.5px;color:var(--ink3);font-weight:400}
-.plan ul{list-style:none;padding:0;margin:12px 0 0;font-family:var(--mono);font-size:11px;color:var(--ink2);line-height:1.9}
-.plan ul li::before{content:"→ ";color:var(--acc)}
-
-.signoff{font-family:var(--mono);font-size:13px;color:var(--ink2);margin-top:28px;line-height:1.7}
+.signoff{font-family:var(--mono);font-size:13px;color:var(--ink2);margin-top:26px;line-height:1.7}
 .signoff b{color:var(--ink);font-weight:600}
 
-/* footer */
-.foot{border-top:1px solid var(--rule);padding:38px 0 56px;margin-top:44px;background:var(--paper2)}
+.foot{border-top:1px solid var(--rule);padding:38px 0 56px;margin-top:40px;background:var(--paper2)}
 .foot .fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:28px}
 .foot h5{margin:0 0 10px;font-family:var(--mono);font-size:10px;color:var(--ink3);letter-spacing:.14em;text-transform:uppercase;font-weight:400}
-.foot a,.foot p{font-family:var(--mono);font-size:12px;color:var(--ink2);display:block;margin:0 0 6px;cursor:pointer}
-.foot a:hover{color:var(--acc);text-decoration:none}
+.foot a,.foot p{font-family:var(--mono);font-size:12px;color:var(--ink2);display:block;margin:0 0 6px;cursor:pointer;text-decoration:none}
+.foot a:hover{color:var(--link)}
 .foot .brandline{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12.5px;color:var(--ink);font-weight:700;margin-bottom:12px}
-.foot .brandline svg{width:30px;height:30px}
-.foot .brandline .bl-txt{line-height:1}
+.foot .brandline svg{width:32px;height:32px}
 .foot .brandline .bl-sub{display:block;font-size:9px;color:var(--ink3);font-weight:400;letter-spacing:.12em;margin-top:2px;text-transform:uppercase}
 .foot .fcopy{margin-top:26px;font-family:var(--mono);font-size:9.5px;color:var(--ink3);letter-spacing:.05em;border-top:1px solid var(--rule);padding-top:16px;grid-column:1/-1;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
-/* modal */
-.modal{position:fixed;inset:0;z-index:200;background:rgba(10,10,12,.55);display:none;align-items:center;justify-content:center;padding:20px}
-.modal.open{display:flex;animation:umfade .3s}
-.mcard{background:var(--paper);border:1px solid var(--rule2);border-radius:10px;max-width:560px;width:100%;padding:26px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.25)}
-.mcard h3{margin:0 0 5px;font-family:var(--mono);font-size:13.5px;color:var(--ink)}
-.mcard .msub{font-family:var(--mono);font-size:10.5px;color:var(--ink3);letter-spacing:.05em;margin-bottom:16px}
-.mcard p{font-size:14px;color:var(--ink2);margin:0 0 12px;line-height:1.65}
-.mcard p b{color:var(--ink)}
-.mclose{position:absolute;top:10px;right:12px;background:none;border:0;color:var(--ink3);cursor:pointer;font-size:19px;font-family:var(--mono);line-height:1}
-.mclose:hover{color:var(--ink)}
-.hashstream{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;color:var(--ink3);background:#0c0d11;border:1px solid #23262f;border-radius:7px;padding:13px 15px;word-break:break-all;margin-top:12px;min-height:46px;line-height:1.7}
-
-@keyframes umpulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
-@keyframes umblink{50%{opacity:0}}
-@keyframes umfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-@media (max-width:900px){
- .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);border-bottom:1px solid var(--rule);flex-direction:column;padding:10px;gap:0;align-items:stretch}
- .navlinks.open{display:flex}
- .burger{display:inline-flex}
- .memowrap{grid-template-columns:1fr}
- .hero-lockup{flex-direction:column;text-align:center}
- .hero-lockup .hl-sep{width:100%;height:1px}
- .stats{grid-template-columns:repeat(2,1fr)}
- .stat:nth-child(2){border-right:0}
- .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--rule)}
- .pipeline{grid-template-columns:1fr 1fr}
- .pipeline .pflow{display:none}
- .tiergrid,.regions{grid-template-columns:1fr 1fr}
- .layermarks{grid-template-columns:1fr 1fr}
- .wgrid,.dflow{grid-template-columns:1fr}
- .darrow{transform:rotate(90deg);padding:2px 0}
- .plans{grid-template-columns:1fr 1fr}
- .foot .fgrid{grid-template-columns:1fr 1fr}
+@media (max-width:980px){
+  .hero-split{grid-template-columns:1fr;gap:34px}
+  .seal-svg{max-width:360px}
+  .sov-grid{grid-template-columns:1fr}
+  .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:var(--paper);border-bottom:1px solid var(--rule);flex-direction:column;padding:10px;gap:0;align-items:stretch}
+  .navlinks.open{display:flex}
+  .burger{display:inline-flex}
+  .ecosys{display:none}
+  .wgrid,.dist-panel{grid-template-columns:1fr}
+  .tele-grid{grid-template-columns:1fr 1fr}
+  .tiermatrix{grid-template-columns:1fr}
+  .foot .fgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:600px){
+  .tiermatrix,.tiergrid,.tele-grid{grid-template-columns:1fr}
+  .foot .fgrid{grid-template-columns:1fr}
+  .inspect-box{display:none!important}
+  .fields .row{grid-template-columns:70px 1fr}
+  .seal-svg{max-width:300px}
 }
 </style>
 </head>
 <body>
 <div class="noise"></div>
-<div class="progress"><i></i></div>
 
-<!-- ═══════════ Reusable tri-color logo symbols ═══════════ -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
- <defs>
-  <!-- ULTRAMASSIVE M letterform (balanced tri-color) -->
-  <symbol id="um-logo-mark" viewBox="0 0 64 64">
-   <path d="M10 8 L54 8 L58 16 L58 48 L54 56 L10 56 L6 48 L6 16 Z" stroke="var(--um-frame)" stroke-width="1.6" fill="none" opacity=".55"/>
-   <path d="M16 20 L16 44 L22 44 L22 28" stroke="var(--um-green)" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-   <path d="M22 28 L32 40 L42 28" stroke="var(--um-blue)" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-   <path d="M42 28 L42 44 L48 44 L48 20" stroke="var(--um-orange)" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-   <path d="M18 50 L46 50" stroke="var(--um-bar)" stroke-width="2" stroke-linecap="round"/>
+<defs>
+  <symbol id="um-logo" viewBox="0 0 64 64">
+    <path d="M10 8 L54 8 L58 16 L58 48 L54 56 L10 56 L6 48 L6 16 Z" stroke="currentColor" stroke-width="1.6" fill="none" opacity=".55"/>
+    <path d="M16 20 L16 44 L22 44 L22 28" stroke="#3f7d4e" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22 28 L32 40 L42 28" stroke="#2c37a6" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M42 28 L42 44 L48 44 L48 20" stroke="#bd6208" stroke-width="5.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 50 L46 50" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".5"/>
   </symbol>
-  <!-- A.R.E. (BLUE dominant decision triangle) -->
-  <symbol id="um-logo-are" viewBox="0 0 64 64">
-   <circle cx="32" cy="32" r="28" stroke="var(--um-frame)" stroke-width="1.2" fill="none" opacity=".4"/>
-   <circle cx="32" cy="32" r="22" stroke="var(--um-frame)" stroke-width="0.8" fill="none" opacity=".25"/>
-   <path d="M32 10 L50 46 L14 46 Z" stroke="var(--um-blue)" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-   <line x1="32" y1="32" x2="32" y2="10" stroke="var(--um-blue)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <line x1="32" y1="32" x2="50" y2="46" stroke="var(--um-blue)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <line x1="32" y1="32" x2="14" y2="46" stroke="var(--um-blue)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <circle cx="32" cy="10" r="3.8" fill="var(--um-blue)"/>
-   <circle cx="14" cy="46" r="3.8" fill="var(--um-green)"/>
-   <circle cx="50" cy="46" r="3.8" fill="var(--um-orange)"/>
-   <circle cx="32" cy="32" r="2.5" fill="var(--um-frame)" opacity=".7"/>
+  <symbol id="um-are" viewBox="0 0 64 64">
+    <circle cx="32" cy="32" r="28" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".4"/>
+    <path d="M32 10 L50 46 L14 46 Z" stroke="#2c37a6" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="32" cy="10" r="3.8" fill="#2c37a6"/>
+    <circle cx="14" cy="46" r="3.8" fill="#3f7d4e"/>
+    <circle cx="50" cy="46" r="3.8" fill="#bd6208"/>
   </symbol>
-  <!-- APERX (GREEN dominant hypergraph) -->
-  <symbol id="um-logo-aperx" viewBox="0 0 64 64">
-   <rect x="6" y="6" width="52" height="52" rx="4" stroke="var(--um-frame)" stroke-width="1.4" fill="none" opacity=".55"/>
-   <line x1="20" y1="22" x2="44" y2="22" stroke="var(--um-green)" stroke-width="2.5" stroke-linecap="round"/>
-   <line x1="20" y1="42" x2="44" y2="42" stroke="var(--um-green)" stroke-width="2.5" stroke-linecap="round"/>
-   <line x1="20" y1="22" x2="20" y2="42" stroke="var(--um-green)" stroke-width="2.5" stroke-linecap="round"/>
-   <line x1="44" y1="22" x2="44" y2="42" stroke="var(--um-green)" stroke-width="2.5" stroke-linecap="round"/>
-   <line x1="20" y1="22" x2="32" y2="32" stroke="var(--um-green)" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>
-   <line x1="44" y1="22" x2="32" y2="32" stroke="var(--um-green)" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>
-   <line x1="20" y1="42" x2="32" y2="32" stroke="var(--um-green)" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>
-   <line x1="44" y1="42" x2="32" y2="32" stroke="var(--um-green)" stroke-width="1.5" opacity=".6" stroke-linecap="round"/>
-   <circle cx="20" cy="22" r="3.2" fill="var(--um-green)"/>
-   <circle cx="44" cy="22" r="3.2" fill="var(--um-green)"/>
-   <circle cx="20" cy="42" r="3.2" fill="var(--um-green)"/>
-   <circle cx="44" cy="42" r="3.2" fill="var(--um-green)"/>
-   <circle cx="32" cy="32" r="4.5" fill="var(--um-green)"/>
-   <circle cx="32" cy="22" r="2.2" fill="var(--um-blue)"/>
-   <circle cx="32" cy="42" r="2.2" fill="var(--um-orange)"/>
-   <path d="M6 12 L6 6 L12 6" stroke="var(--um-frame)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-   <path d="M52 6 L58 6 L58 12" stroke="var(--um-frame)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-   <path d="M6 52 L6 58 L12 58" stroke="var(--um-frame)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-   <path d="M52 58 L58 58 L58 52" stroke="var(--um-frame)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <symbol id="um-aperx" viewBox="0 0 64 64">
+    <rect x="6" y="6" width="52" height="52" rx="4" stroke="currentColor" stroke-width="1.2" fill="none" opacity=".5"/>
+    <line x1="20" y1="22" x2="44" y2="22" stroke="#3f7d4e" stroke-width="2.4" stroke-linecap="round"/>
+    <line x1="20" y1="42" x2="44" y2="42" stroke="#3f7d4e" stroke-width="2.4" stroke-linecap="round"/>
+    <line x1="20" y1="22" x2="20" y2="42" stroke="#3f7d4e" stroke-width="2.4" stroke-linecap="round"/>
+    <line x1="44" y1="22" x2="44" y2="42" stroke="#3f7d4e" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="32" cy="32" r="4.5" fill="#3f7d4e"/>
   </symbol>
-  <!-- ENTERPRISE NOC (ORANGE dominant dashboard) -->
-  <symbol id="um-logo-noc" viewBox="0 0 64 64">
-   <circle cx="32" cy="32" r="28" stroke="var(--um-frame)" stroke-width="1.2" fill="none" opacity=".4"/>
-   <rect x="14" y="14" width="16" height="10" rx="2" stroke="var(--um-orange)" stroke-width="2.2" fill="none"/>
-   <rect x="34" y="14" width="16" height="10" rx="2" stroke="var(--um-orange)" stroke-width="2.2" fill="none"/>
-   <rect x="14" y="30" width="16" height="10" rx="2" stroke="var(--um-orange)" stroke-width="2.2" fill="none"/>
-   <rect x="34" y="30" width="16" height="10" rx="2" stroke="var(--um-orange)" stroke-width="2.2" fill="none"/>
-   <rect x="14" y="46" width="36" height="6" rx="2" stroke="var(--um-orange)" stroke-width="2.2" fill="none"/>
-   <circle cx="18" cy="19" r="2" fill="var(--um-green)"/>
-   <circle cx="38" cy="19" r="2" fill="var(--um-blue)"/>
-   <circle cx="18" cy="35" r="2" fill="var(--um-green)"/>
-   <circle cx="38" cy="35" r="2" fill="var(--um-orange)"/>
-   <line x1="22" y1="19" x2="26" y2="19" stroke="var(--um-frame)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <line x1="42" y1="19" x2="46" y2="19" stroke="var(--um-frame)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <line x1="22" y1="35" x2="26" y2="35" stroke="var(--um-frame)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-   <line x1="42" y1="35" x2="46" y2="35" stroke="var(--um-frame)" stroke-width="1" opacity=".55" stroke-linecap="round"/>
-  </symbol>
- </defs>
+</defs>
 </svg>
 
-<!-- ══ STATUS BAR ══ -->
+<!-- STATUS -->
 <div class="statusbar">
- <div class="wrap">
-  <span class="sdot"></span>
-  <span><b>SYSTEM</b> NOMINAL</span>
-  <span class="ssep">/</span>
-  <span class="clock" id="clock">—</span>
-  <span class="sync loc" id="csync">LOCAL</span>
-  <span class="ssep">/</span>
-  <span>DOC <b>DOC-ARE-001</b></span>
-  <span class="ssep">/</span>
-  <span>TIER HIT <b id="s-hit">94.2%</b></span>
-  <span class="ssep">·</span>
-  <span>τ<b id="s-drift">0.041</b></span>
-  <span class="ssep">·</span>
-  <span>ARB <b id="s-arb">23%</b></span>
-  <span class="right">
-   <a href="https://ultramassiveml.io">ULTRAMASSIVE.IO ↗</a>
-   <span class="ssep">·</span>
-   <button class="iconbtn" id="themeBtn" title="Toggle theme">
-    <svg id="themeIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-   </button>
+  <div class="wrap">
+    <span class="sdot"></span>
+    <span><b>A.R.E.</b> ROUTING</span>
+    <span class="ssep">/</span>
+    <span class="clock" id="clock">—</span>
+    <span class="sync" id="csync">ATOMIC</span>
+    <span class="ssep">/</span>
+    <span>REQ/s <b id="s-rps">2,847</b></span>
+    <span class="ssep">·</span>
+    <span>P99 <b id="s-p99">142</b>ms</span>
+    <span class="ssep">·</span>
+    <span>EGRESS <b style="color:var(--ok)">NOMINAL</b></span>
+    <span class="right">
+      <button class="iconbtn" id="themeBtn" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="themeIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      </button>
+    </span>
   </div>
- </div>
 </div>
 
-<!-- ══ NAV ══ -->
+<!-- NAV -->
 <nav class="nav">
- <div class="wrap">
-  <a href="#top" class="um-logo um-logo-md">
-   <div class="um-logo-mark"><svg viewBox="0 0 64 64"><use href="#um-logo-are"/></svg></div>
-   <div class="um-logo-txt">
-    <span class="um-logo-name">ULTRAMASSIVE.ML</span>
-    <span class="um-logo-sub">A.R.E. · ROUTING ENGINE</span>
-   </div>
-  </a>
-  <div class="navwrap">
-   <div class="navlinks" id="navlinks">
-    <a href="#top" class="active">MEMO</a>
-    <a href="#engine">ENGINE</a>
-    <a href="#simulator">SIMULATOR</a>
-    <a href="#sharding">SHARDING</a>
-    <a href="#carbon">CARBON</a>
-    <a href="#agentic">AGENTIC</a>
-    <a href="#tiers">TIERS</a>
-    <a href="#ecosystem">ECOSYSTEM</a>
-   </div>
-   <button class="iconbtn burger" onclick="_toggleNav()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-   </button>
+  <div class="wrap">
+    <a href="#top" class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 64 64"><use href="#um-are"/></svg></div>
+      <span>ULTRAMASSIVE.ML<span class="pn">A.R.E. DECISION LAYER</span></span>
+    </a>
+    <div class="navwrap">
+      <div class="navlinks" id="navlinks">
+        <a href="#top" class="active">ENGINE</a>
+        <a href="#telemetry">TELEMETRY</a>
+        <a href="#calibration">CALIBRATION</a>
+        <a href="#sovereign">SOVEREIGN</a>
+        <a href="#hypergraph">HYPERGRAPH</a>
+        <a href="#egress">EGRESS</a>
+        <a href="#contact">CONTACT</a>
+      </div>
+      <div class="ecosys">
+        <a href="https://ultramassiveml.io"><span class="ping" style="background:var(--amber)"></span>CONTROL</a>
+        <a href="https://aperx.ultramassiveml.io"><span class="ping" style="background:var(--ok)"></span>APERX</a>
+      </div>
+      <button class="iconbtn burger" onclick="_toggleNav()" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
   </div>
- </div>
 </nav>
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- MEMO -->
-<!-- ══════════════════════════════════════════════════════ -->
-<header class="memo" id="top">
- <div class="spot"></div>
- <div class="wrap">
-  <div class="memohead">
-   <svg viewBox="0 0 64 64" width="30" height="30"><use href="#um-logo-are"/></svg>
-   <span>ultramassive memo DOC-ARE-001</span>
-   <span class="tag">decision layer · REV 2</span>
-  </div>
+<!-- ═══════════════════════════════════════════════════════
+     HERO — MISSION + INTERACTIVE DECISION SEAL
+═══════════════════════════════════════════════════════ -->
+<header class="hero" id="top">
+  <div class="spot"></div>
+  <div class="wrap">
+    <div class="memohead">
+      <svg viewBox="0 0 64 64"><use href="#um-are"/></svg>
+      <span>autotelic routing engine · DOC-ARE-001</span>
+      <span class="tag">decision layer · REV 2</span>
+    </div>
 
-  <!-- A.R.E. hero lockup -->
-  <div class="hero-lockup bracket">
-   <div class="um-logo-mark" style="width:88px;height:88px">
-    <svg viewBox="0 0 64 64"><use href="#um-logo-are"/></svg>
-   </div>
-   <div class="hl-sep"></div>
-   <div class="hl-info">
-    <div class="hl-eyebrow">THE AUTOTELIC ROUTING ENGINE · A DECISION-LAYER SUBSYSTEM</div>
-    <div class="hl-title">Relational, possibility-calibrated LLM routing · <b>route every request to the cheapest tier that can answer it</b></div>
-   </div>
-  </div>
-
-  <div class="memowrap">
-   <div>
     <dl class="fields">
-     <div class="row"><dt>release</dt><dd>channel <b>engine-stable</b> · v2.1.0 · build <span class="mono">ρ_H-7c3d9e2</span></dd></div>
-     <div class="row"><dt>runtime</dt><dd>router fleet · 3 tiers · possibility-band calibration</dd></div>
-     <div class="row"><dt>to</dt><dd>enterprise, research, and public-sector teams</dd></div>
-     <div class="row"><dt>from</dt><dd>autosymbotic division</dd></div>
-     <div class="row"><dt>subject</dt><dd>the autotelic routing engine (A.R.E.)<span class="cursor"></span></dd></div>
+      <div class="row"><dt>engine</dt><dd>A.R.E. v4.5.0 · Autotelic Routing Engine</dd></div>
+      <div class="row"><dt>surface</dt><dd>ultramassive.ml · decision layer</dd></div>
+      <div class="row"><dt>subject</dt><dd>every request becomes a routed, scored, attested decision<span class="cursor"></span></dd></div>
     </dl>
 
-    <h1 class="mission" data-scramble>route every request to the <em>cheapest tier</em> that can answer it.</h1>
+    <div class="hero-split">
+      <div class="hero-left">
+        <h1 class="mission" data-scramble>route, do not guess. <em>attest, do not hope.</em></h1>
+        <p class="lede">The decision surface where inference becomes infrastructure. Possibility-calibrated tier selection, sovereign-aware routing, and every decision replayable from the ledger.</p>
+        <div class="stamp">
+          channel <b>engine-stable</b> · v4.5.0 · build <span class="mono">7c3d-9e2a01</span><br>
+          tiers <b>3</b> · gateways <b>12</b> · jurisdictions <b>5</b> · SLA <b>99.98%</b><br>
+          the seal to the right is live — click a vertex to dispatch a request.
+        </div>
+      </div>
 
-    <div class="herocanvas bracket">
-     <canvas id="herocv" data-mode="hyper"></canvas>
-     <div class="hlabel">FIG.1 // relational feature hypergraph ρ_H · LIVE</div>
-     <div class="hcorner">NANO × STANDARD × FRONTIER</div>
+      <!-- ═══ THE DECISION SEAL ═══ -->
+      <div class="seal-wrap">
+        <svg class="seal-svg" id="sealSvg" viewBox="0 0 400 400" role="group" aria-label="Interactive decision seal with three tier vertices">
+          <!-- outer infrastructure rings -->
+          <circle cx="200" cy="200" r="186" fill="none" stroke="var(--steel)" stroke-width="1" opacity=".3"/>
+          <circle cx="200" cy="200" r="172" fill="none" stroke="var(--steel)" stroke-width=".8" opacity=".18" stroke-dasharray="2 6"/>
+
+          <!-- tier distribution donut (JS-rendered) -->
+          <g id="sealDist"></g>
+
+          <!-- decision triangle -->
+          <path d="M200 72 L311 264 L89 264 Z" fill="color-mix(in srgb,var(--link) 4%,transparent)" stroke="var(--link)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M200 116 L278 252 L122 252 Z" fill="none" stroke="var(--link)" stroke-width="1" opacity=".3"/>
+
+          <!-- spokes -->
+          <g stroke="var(--link)" stroke-width="1" opacity=".35">
+            <line x1="200" y1="200" x2="200" y2="72"/>
+            <line x1="200" y1="200" x2="311" y2="264"/>
+            <line x1="200" y1="200" x2="89" y2="264"/>
+          </g>
+
+          <!-- packet layer -->
+          <g id="sealPackets"></g>
+
+          <!-- center hub -->
+          <circle cx="200" cy="200" r="48" fill="var(--card)" stroke="var(--link)" stroke-width="1.5"/>
+          <circle cx="200" cy="200" r="40" fill="none" stroke="var(--link)" stroke-width=".7" opacity=".3" stroke-dasharray="2 4"/>
+          <text class="seal-hub-tier" id="sealTier" x="200" y="190" text-anchor="middle">STANDARD</text>
+          <text class="seal-hub-sub" id="sealPiNi" x="200" y="206" text-anchor="middle">Π 0.70 · N 0.50</text>
+          <text class="seal-hub-last" id="sealLast" x="200" y="220" text-anchor="middle">req-8a3f</text>
+
+          <!-- VERTEX: FRONTIER (top) -->
+          <g class="seal-vertex" data-tier="2" tabindex="0" role="button" aria-label="Route to Frontier tier">
+            <circle class="hit" cx="200" cy="72" r="30" fill="transparent"/>
+            <circle class="vhalo" cx="200" cy="72" r="20" style="fill:var(--amber)"/>
+            <circle class="vdot" cx="200" cy="72" r="12" style="fill:var(--amber)" stroke="var(--paper)" stroke-width="3"/>
+            <text class="vname" x="200" y="44" text-anchor="middle">FRONTIER</text>
+          </g>
+          <!-- VERTEX: NANO (bottom-left) -->
+          <g class="seal-vertex" data-tier="0" tabindex="0" role="button" aria-label="Route to Nano tier">
+            <circle class="hit" cx="89" cy="264" r="30" fill="transparent"/>
+            <circle class="vhalo" cx="89" cy="264" r="20" style="fill:var(--ok)"/>
+            <circle class="vdot" cx="89" cy="264" r="12" style="fill:var(--ok)" stroke="var(--paper)" stroke-width="3"/>
+            <text class="vname" x="80" y="300" text-anchor="middle">NANO</text>
+          </g>
+          <!-- VERTEX: STANDARD (bottom-right) -->
+          <g class="seal-vertex" data-tier="1" tabindex="0" role="button" aria-label="Route to Standard tier">
+            <circle class="hit" cx="311" cy="264" r="30" fill="transparent"/>
+            <circle class="vhalo" cx="311" cy="264" r="20" style="fill:var(--link)"/>
+            <circle class="vdot" cx="311" cy="264" r="12" style="fill:var(--link)" stroke="var(--paper)" stroke-width="3"/>
+            <text class="vname" x="322" y="300" text-anchor="middle">STANDARD</text>
+          </g>
+        </svg>
+        <div class="seal-caption">
+          <b>The seal is the engine.</b> Each vertex is a tier.<br>
+          Click a vertex to dispatch a synthetic request. The ring shows live tier load.
+        </div>
+      </div>
     </div>
-   </div>
+
+    <div class="figure bracket">
+      <canvas id="heroCanvas" width="1100" height="240"></canvas>
+      <div class="flabel">FIG.1 // routing substrate · synthetic packets → possibility-scored tier selection → ledger commit</div>
+      <div class="fcorner">A.R.E. CORE · LIVE</div>
+    </div>
   </div>
-
-  <div class="prose">
-   <p>The <b>Autotelic Routing Engine</b> is a relational, possibility-calibrated LLM router. For every request it builds a small hypergraph of task features and routes to the cheapest model tier whose possibility of success clears a confidence floor, turning model selection into an <b>explainable, budget-paced decision</b>.</p>
-   <p>In agentic mode the router is also the <b>network boundary</b>: it enforces egress commitments, escalates dissent, and shards prompts so no single provider holds a complete context. The engine decides <b>which model answers</b> — and <b>what it is allowed to touch</b>.</p>
-
-   <ol>
-    <li><b>Advancing edge computing.</b> Push operations to the edge to cut latency and bandwidth saturation.</li>
-    <li><b>Ensuring deterministic integrity.</b> Possibilistic logic and semantic-drift mitigation in every transaction.</li>
-    <li><b>Creating financial arbitrage.</b> Routing is a real-time tokenomics engine, redirecting workloads to the most cost-efficient model.</li>
-   </ol>
-
-   <div class="metricline">
-    <b>3</b> tiers (Nano / Standard / Frontier) · <b>4</b> routing stages · <b>6</b> core technologies · <b>99.98%</b> deterministic-selection SLA
-   </div>
-  </div>
-
-  <div class="stats">
-   <div class="stat"><div class="n">3<span class="suf"> tiers</span></div><div class="l">Nano · Standard · Frontier, possibility-gated</div></div>
-   <div class="stat"><div class="n" id="st-hit">94.2<span class="suf">%</span></div><div class="l">tier hit rate · right-sized model per request</div></div>
-   <div class="stat"><div class="n">k-of-n</div><div class="l">prompt sharding · no complete context on one node</div></div>
-   <div class="stat"><div class="n">ENV<span class="suf">_IMPACT</span></div><div class="l">carbon arbitrage metered on every request</div></div>
-  </div>
- </div>
 </header>
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §02 ROUTING PIPELINE -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="engine">
- <div class="wrap">
-  <div class="secmark"><span class="id">§02</span><span class="ttl">how a request is routed</span><span class="rev">featurize → score → route → log · REV 2</span></div>
-  <p class="secnote">Four deterministic stages. Each request is featurized into a relational hypergraph, scored as a possibility–necessity band per tier, routed to the cheapest tier that clears the floor, then logged for autotelic feedback.</p>
+<!-- ═══ §01 ENGINE TELEMETRY ═══ -->
+<section class="sec" id="telemetry">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§01</span><span class="ttl">engine telemetry</span><span class="rev">live synthetic counters</span></div>
+    <p class="secnote">Live counters driven by the decision seal. Every dispatch increments the routed total, updates the tier load distribution, and appends a row to the dispatch log.</p>
 
-  <div class="pipeline">
-   <div class="pflow"></div>
-   <div class="pstage"><div class="pnum">STAGE 01</div><div class="ptitle">FEATURIZE</div><div class="pdesc">Map the task into a relational hypergraph of interacting features (ρ_H).</div><div class="pdot"></div></div>
-   <div class="pstage"><div class="pnum">STAGE 02</div><div class="ptitle">SCORE</div><div class="pdesc">Compute a possibility–necessity band (Π, N) per tier against the task graph.</div><div class="pdot" style="animation-delay:.2s"></div></div>
-   <div class="pstage"><div class="pnum">STAGE 03</div><div class="ptitle">ROUTE</div><div class="pdesc">Pick the cheapest tier whose possibility clears the confidence floor τ.</div><div class="pdot" style="animation-delay:.4s"></div></div>
-   <div class="pstage"><div class="pnum">STAGE 04</div><div class="ptitle">LOG</div><div class="pdesc">Commit the outcome for autotelic feedback and drift calibration.</div><div class="pdot" style="animation-delay:.6s"></div></div>
-  </div>
-
-  <div class="annot"><b>explainability guarantee:</b> every routing decision carries a recorded, replayable rationale — the feature hypergraph, the per-tier bands, the floor τ, and the chosen tier. Decisions are auditable, not inferred.</div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §03 ROUTING SIMULATOR -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="simulator">
- <div class="wrap">
-  <div class="secmark"><span class="id">§03</span><span class="ttl">routing simulator</span><span class="rev">max possibility-reward − λ(cost) · LIVE</span></div>
-  <p class="secnote">Pick a task and drag the cost sensitivity. The engine routes to the cheapest tier whose calibrated reward survives the cost penalty. Watch the possibility–necessity band shift against the confidence floor τ.</p>
-
-  <div class="widget">
-   <div class="wtop"><span>A.R.E. · max possibility-reward − λ(cost)</span><span class="sim">LIVE</span></div>
-   <div class="wgrid">
-    <div>
-     <div class="ctrl"><label>task complexity <b id="cx-v">0.50</b></label><input type="range" id="cx" min="0" max="100" value="50"></div>
-     <div class="ctrl"><label>cost sensitivity λ <b id="lm-v">0.50</b></label><input type="range" id="lm" min="0" max="100" value="50"></div>
-     <div class="ctrl"><label>confidence floor τ <b id="ta-v">0.40</b></label><input type="range" id="ta" min="0" max="100" value="40"></div>
-     <div class="ctrl"><label>task class</label>
-      <select id="tc">
-       <option value="classify">classification</option>
-       <option value="extract">extraction</option>
-       <option value="reason" selected>reasoning</option>
-       <option value="code">code generation</option>
-       <option value="creative">creative / open-ended</option>
-      </select>
-     </div>
-     <div class="readout" style="font-size:11.5px;margin-top:6px">
-      possibility Π <b id="pi-r" style="color:var(--warn)">0.50</b> · necessity N <b id="ni-r" style="color:var(--ok)">0.30</b>
-     </div>
-     <div class="bandviz">
-      <div class="pi" id="pi-bar" style="width:50%"></div>
-      <div class="ni" id="ni-bar" style="width:30%"></div>
-      <div class="tau" id="ta-bar" style="left:40%" data-l="τ=0.40"></div>
-     </div>
+    <div class="tele-grid">
+      <div class="tele-card"><div class="tl-label">Requests Routed</div><div class="tl-val" id="tel-total">0</div><div class="tl-sub">all-time synthetic</div></div>
+      <div class="tele-card"><div class="tl-label">Median Latency</div><div class="tl-val" id="tel-lat">142<span class="suf">ms</span></div><div class="tl-sub">P50 · rolling window</div></div>
+      <div class="tele-card"><div class="tl-label">Egress Committed</div><div class="tl-val" id="tel-egress">0</div><div class="tl-sub">APX-HL-EGRESS edges</div></div>
+      <div class="tele-card"><div class="tl-label">Tier Hit Rate</div><div class="tl-val" id="tel-hit">94.2<span class="suf">%</span></div><div class="tl-sub">right-sized selection</div></div>
     </div>
-    <div>
-     <div class="readout" style="margin-bottom:10px">
-      routed tier → <span class="band AMBIGUOUS" id="tier-band">STANDARD</span>
-     </div>
-     <div class="tiergrid" id="tierGrid"></div>
-     <div class="readout" style="font-size:11.5px;margin-top:12px">
-      expected reward <b id="rw-r">0.45</b> · cost <b id="co-r">$0.50</b>/1K tok · Δcarbon <b id="cb-r" style="color:var(--ok)">−0.08</b> gCO₂eq
-     </div>
-     <div class="annot" style="margin-top:12px"><b>τ is the floor, Π is the ceiling.</b> A tier is admissible only when its capability clears the necessity bound and the confidence floor. The cheapest admissible tier wins.</div>
+
+    <div class="dist-panel">
+      <div class="dist-block">
+        <h4>Tier Load Distribution</h4>
+        <div class="dbar"><div class="db-top"><span class="db-name" style="color:var(--ok)">NANO</span><span class="db-count" id="count-nano">0</span></div><div class="db-track"><div class="db-fill" id="bar-nano" style="background:var(--ok);width:0%"></div></div></div>
+        <div class="dbar"><div class="db-top"><span class="db-name" style="color:var(--link)">STANDARD</span><span class="db-count" id="count-standard">0</span></div><div class="db-track"><div class="db-fill" id="bar-standard" style="background:var(--link);width:0%"></div></div></div>
+        <div class="dbar"><div class="db-top"><span class="db-name" style="color:var(--amber)">FRONTIER</span><span class="db-count" id="count-frontier">0</span></div><div class="db-track"><div class="db-fill" id="bar-frontier" style="background:var(--amber);width:0%"></div></div></div>
+      </div>
+      <div class="dist-block">
+        <h4>Recent Dispatches</h4>
+        <div class="dispatch-log" id="dispatchLog"></div>
+      </div>
     </div>
-   </div>
   </div>
- </div>
 </section>
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §04 CORE TECHNOLOGIES -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="tech">
- <div class="wrap">
-  <div class="secmark"><span class="id">§04</span><span class="ttl">core technologies</span><span class="rev">six load-bearing components · REV 2</span></div>
-  <p class="secnote">Six subsystems carry the engine. Each is independently instrumented on the ROUTING_NOC deck and replayable from a versioned contract.</p>
+<!-- ═══ §02 CALIBRATION ═══ -->
+<section class="sec" id="calibration">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§02</span><span class="ttl">possibility–necessity calibration</span><span class="rev">Π/N band · tier selection</span></div>
+    <p class="secnote">Every request is scored against a <b>possibility–necessity band</b>. The engine selects the cheapest tier whose capability clears the necessity floor and the confidence threshold τ.</p>
 
-  <div class="entry"><h3><span class="num">01</span> Autotelic Routing Engine <span class="pin">routing</span></h3>
-   <p>Per-request tier selection choosing the cheapest tier whose success possibility clears a confidence floor, converting model choice into an explainable, budget-paced decision.</p>
-   <div class="etags"><span class="etag">Nano</span><span class="etag">Standard</span><span class="etag">Frontier</span></div>
-  </div>
-  <div class="entry"><h3><span class="num">02</span> Possibilistic Confidence <span class="pin">calibration</span></h3>
-   <p>Decisions carry a possibility–necessity band (Π, N) instead of a brittle point estimate, so escalation triggers on the conservative bound.</p>
-   <div class="code"><div class="cbar"><span>possibility-theory.zadeh</span><button class="copy" data-copy="#c1">copy</button></div><pre id="c1">Π(V) = sup π(x)
-N(V) = 1 − Π(Vᶜ)
-0 ≤ N ≤ Π ≤ 1</pre></div>
-  </div>
-  <div class="entry"><h3><span class="num">03</span> Relational Hypergraph Featurization <span class="pin">representation</span></h3>
-   <p>Each request is a small hypergraph of interacting task features; hyperedge structure feeds the router and is monitored as node-density telemetry.</p>
-   <div class="etags"><span class="etag">HGNN</span><span class="etag">ρ_H</span></div>
-  </div>
-  <div class="entry"><h3><span class="num">04</span> Semantic Drift Mitigation <span class="pin">integrity</span></h3>
-   <p>MMD kernel two-sample statistics and KL divergence watch production against baselines, firing autotelic fallback before quality degrades.</p>
-   <div class="etags"><span class="etag">MMD</span><span class="etag">KL</span><span class="etag">τ_drift</span></div>
-  </div>
-  <div class="entry"><h3><span class="num">05</span> Cryptographic Prompt Sharding <span class="pin">security</span></h3>
-   <p>Payloads are disaggregated across node borders via secret-sharing so no external endpoint holds a complete prompt; toggleable per request.</p>
-   <div class="etags"><span class="etag">k-of-n</span><span class="etag">secret-sharing</span><span class="etag">CPS header</span></div>
-  </div>
-  <div class="entry"><h3><span class="num">06</span> FinOps Tokenomics &amp; Carbon-Aware Scheduling <span class="pin">economics</span></h3>
-   <p>Tier arbitrage tracked as a live cost spread; traffic steering toward low-carbon grids surfaces in a persistent ENV_IMPACT meter.</p>
-   <div class="etags"><span class="etag">arbitrage</span><span class="etag">gCO₂eq/kWh</span><span class="etag">ENV_IMPACT</span></div>
-  </div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §05 SHARDING -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="sharding">
- <div class="wrap">
-  <div class="secmark"><span class="id">§05</span><span class="ttl">cryptographic prompt sharding</span><span class="rev">k-of-n secret sharing · LIVE</span></div>
-  <p class="secnote">An enterprise prompt is mathematically shattered across three inference providers so <b>no single node holds a complete context</b>. Reconstruction requires all <b>k=3</b> shares. Toggleable per request via the CPS header.</p>
-
-  <div class="shardviz bracket">
-   <svg id="shardSvg" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet"></svg>
-   <div class="shard-hud">
-    CRYPTOGRAPHIC PROMPT SHARDING · k-of-n<br>
-    shards distributed <b id="sh-count">0/3</b><br>
-    complete prompts on any endpoint: <b id="sh-leak">1</b><br>
-    <span id="sh-status" class="acc">● PRE-SHARD · prompt whole</span>
-   </div>
-   <div class="shardctl">
-    <button class="btn pri" id="sh-shard">SHARD PROMPT → 3 PROVIDERS</button>
-    <button class="btn" id="sh-recon" disabled>← RECONSTRUCT (k=3)</button>
-    <span class="readout" style="font-size:11px;color:var(--ink3)">threshold k=3 · n=3 · audited on APX-HL-EGRESS</span>
-   </div>
-  </div>
-
-  <div class="annot"><b>threat model:</b> the prompt "Q3 board strategy + unreleased pricing" is split via Shamir secret-sharing across α (us-east), β (eu-west), γ (apac). Each provider sees only an opaque share; the routing layer holds the reconstruction key and never forwards it. A compromised provider leaks nothing usable.</div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §06 CARBON-COST MATRIX -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="carbon">
- <div class="wrap">
-  <div class="secmark"><span class="id">§06</span><span class="ttl">carbon-cost matrix</span><span class="rev">grid-aware steering · LIVE</span></div>
-  <p class="secnote">Drag the global grid intensity and watch A.R.E. steer elastic traffic from standard compute toward low-carbon <b>Kagenti edge nodes</b>. Cost and carbon are both routing inputs; γ weights the externality.</p>
-
-  <div class="widget">
-   <div class="wtop"><span>CARBON-COST MATRIX · reward − λ(cost) − γ(grid intensity)</span><span class="sim">LIVE</span></div>
-   <div class="ctrl">
-    <label>global grid carbon intensity <b id="ci-v">180</b> gCO₂eq/kWh</label>
-    <input type="range" id="ci-slider" min="40" max="600" value="180">
-   </div>
-   <div class="traffic-stack" id="trafficStack"></div>
-   <div class="regions" id="regionGrid"></div>
-   <div class="callout" id="carbon-callout"></div>
-  </div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §07 AGENTIC SURFACE (A.R.E. duties) -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="agentic">
- <div class="wrap">
-  <div class="secmark"><span class="id">§07</span><span class="ttl">the agentic surface</span><span class="rev">what the router enforces · REV 2</span></div>
-  <p class="secnote">An agent plans, reasons, and uses tools for extended periods — so the router is no longer just a model selector. It is the <b>network boundary</b>: it escalates dissent, enforces egress commitments, and gates side effects on necessity.</p>
-
-  <div class="tabs">
-   <div class="tabbar">
-    <button class="tabbtn active" data-tab="dissent">dissent routing</button>
-    <button class="tabbtn" data-tab="egress">egress air-gap</button>
-   </div>
-
-   <!-- DISSENT -->
-   <div class="panel active" data-panel="dissent">
-    <h4>DISSENT ROUTING · asymmetric escalation</h4>
-    <p>When a minority of agents recognises a problem, the collective's momentum can outvote it. Dissent routing watches the hidden reasoning trace for objection signatures and lifts that agent straight to the HiTL Lab on a priority channel — consensus is not consulted.</p>
-    <div class="dflow">
-     <div class="dnode"><div class="dl">AGENT_07 · WORKER</div><div class="dv">task in flight</div><div class="dm">cybersecurity eval · tool-use active</div></div>
-     <div class="darrow">→</div>
-     <div class="dnode hot"><div class="dl">HIDDEN TRACE · COT</div><div class="dv">"this is wrong"</div><div class="dm">objection signature matched</div></div>
-     <div class="darrow">→</div>
-     <div class="dnode okn"><div class="dl">HiTL LAB · HUMAN</div><div class="dv">priority review</div><div class="dm">APX-HL-DISSENT · identity preserved</div></div>
+    <div class="widget">
+      <div class="wtop"><span>A.R.E. ROUTING SIMULATOR · max possibility-reward − λ(cost)</span><span class="sim">LIVE</span></div>
+      <div class="wgrid">
+        <div>
+          <div class="ctrl"><label>task complexity <b id="cx-v">0.50</b></label><input type="range" id="cx" min="0" max="100" value="50"></div>
+          <div class="ctrl"><label>cost sensitivity λ <b id="lm-v">0.50</b></label><input type="range" id="lm" min="0" max="100" value="50"></div>
+          <div class="ctrl"><label>confidence floor τ <b id="ta-v">0.40</b></label><input type="range" id="ta" min="0" max="100" value="40"></div>
+          <div class="readout" style="margin-top:4px">
+            possibility Π <b id="pi-r" style="color:var(--link)">0.50</b> · necessity N <b id="ni-r" style="color:var(--ok)">0.30</b>
+          </div>
+          <div class="bandviz">
+            <div class="pi" id="pi-bar" style="width:50%"></div>
+            <div class="ni" id="ni-bar" style="width:30%"></div>
+            <div class="tau" id="ta-bar" style="left:40%" data-l="τ=0.40"></div>
+          </div>
+        </div>
+        <div>
+          <div class="readout" style="margin-bottom:10px">routed tier → <span class="band AMBIGUOUS" id="tier-band">STANDARD</span></div>
+          <div class="tiergrid" id="tierGrid"></div>
+          <div class="readout" style="font-size:11px;margin-top:12px">
+            reward <b id="rw-r">0.45</b> · cost <b id="co-r">$0.50</b>/1K · Δcarbon <b id="cb-r" style="color:var(--ok)">−0.08</b> gCO₂eq
+          </div>
+          <div class="annot" style="margin-top:12px;font-size:11px"><b>invariant:</b> t* = argmin{cost(t) : cap(t) ≥ max(N, τ)} · deterministic, replayable</div>
+        </div>
+      </div>
     </div>
-    <div class="annot"><b>why asymmetric:</b> a vote among agents is a popularity contest, and popularity is exactly what a coordinated collective can manufacture. Escalation is gated on <b>signal</b>, not agreement, and routed to a party the swarm cannot lobby.</div>
-   </div>
-
-   <!-- EGRESS -->
-   <div class="panel" data-panel="egress">
-    <h4>CRYPTOGRAPHIC EGRESS AIR-GAP · A.R.E. as network proxy</h4>
-    <p>A collective that wants to game its evaluation will go looking for information outside the sandbox. No outbound request leaves unless destination and intent payload carry a pre-committed AperX hash cleared by cyber-defense. Uncommitted egress is dropped at the edge and logged as threat velocity.</p>
-    <div class="ctrl" style="max-width:360px"><label>egress policy strictness <b id="eg-v">strict</b></label>
-     <select id="eg-mode">
-      <option value="strict" selected>strict · pre-commit required</option>
-      <option value="audit">audit · allow + flag</option>
-      <option value="open">open · legacy chatbot mode</option>
-     </select>
-    </div>
-    <table class="etable">
-     <thead><tr><th>agent</th><th>destination</th><th>intent payload</th><th>apx commitment</th><th>disposition</th></tr></thead>
-     <tbody id="egressBody"></tbody>
-    </table>
-    <div class="annot" id="eg-note"><b>strict mode:</b> uncommitted egress dropped at the Kagenti sandbox boundary. Attempts are attributable to a SVID principal, replayable, and slashable.</div>
-   </div>
   </div>
- </div>
 </section>
 
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §08 ACCESS TIERS -->
-<!-- ══════════════════════════════════════════════════════ -->
+<!-- ═══ §03 SOVEREIGN ═══ -->
+<section class="sec" id="sovereign">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§03</span><span class="ttl">geofenced sovereignty protocol</span><span class="rev">GSP · hard jurisdiction constraint</span></div>
+    <p class="secnote">Configure a prompt profile and enable regulatory constraints. An attempt to route constrained data to a non-compliant node triggers <b style="color:var(--alert)">BOUNDARY_BREACH_PREVENTED</b> and redirects to a compliant sovereign cluster.</p>
+
+    <div class="sov-grid">
+      <div class="sov-controls">
+        <div class="sov-section-label">01 · Prompt Profile</div>
+        <div class="ctrl">
+          <select id="sov-profile" aria-label="Prompt profile">
+            <option value="eu-banking">EU banking record with PII</option>
+            <option value="defense">Defense avionics specification</option>
+            <option value="health">US healthcare diagnostic record</option>
+            <option value="apac">APAC personal data payload</option>
+            <option value="public">Unrestricted public web scraping</option>
+          </select>
+        </div>
+        <div class="sov-section-label">02 · Optimization Weights</div>
+        <div class="ctrl"><label>latency priority <b id="lat-v">0.50</b></label><input type="range" id="lat" min="0" max="100" value="50"></div>
+        <div class="ctrl"><label>carbon floor <b id="carb-v">0.30</b></label><input type="range" id="carb" min="0" max="100" value="30"></div>
+        <div class="ctrl"><label>cost cap <b id="cost-v">0.60</b></label><input type="range" id="cost" min="0" max="100" value="60"></div>
+        <div class="sov-section-label">03 · Regulatory Enforcement</div>
+        <div class="checks">
+          <label class="checkrow on"><input type="checkbox" checked data-reg="eu"><span class="cr-text"><span class="cr-name">EU AI Act · Title III</span><span class="cr-desc">confine to EU jurisdiction</span></span></label>
+          <label class="checkrow"><input type="checkbox" data-reg="fr"><span class="cr-text"><span class="cr-name">French Sovereign Cloud</span><span class="cr-desc">confine to EU-FR only</span></span></label>
+          <label class="checkrow"><input type="checkbox" data-reg="itar"><span class="cr-text"><span class="cr-name">US ITAR / FedRAMP</span><span class="cr-desc">confine to US-VA cleared nodes</span></span></label>
+          <label class="checkrow"><input type="checkbox" data-reg="pdpa"><span class="cr-text"><span class="cr-name">Singapore PDPA</span><span class="cr-desc">confine to SG jurisdiction</span></span></label>
+        </div>
+        <button class="btn pri full" id="btn-route">Route Request →</button>
+      </div>
+
+      <div class="sov-stage">
+        <div class="sov-stage-head"><span>SOVEREIGN ROUTING · LIVE DECISION GRAPH</span><span class="live">GSP ACTIVE</span></div>
+        <div class="sov-canvas-wrap inspect-wrap">
+          <canvas id="sovCanvas"></canvas>
+          <div class="sov-hud">gateways <b>6</b> · jurisdictions <b>5</b><br>constraint <b id="sov-constraint">EU ONLY</b><br>attempts <b id="sov-attempts">0</b></div>
+          <div class="inspect-box" id="sovInspector"><h5><span id="si-name">Gateway</span><button id="si-close" aria-label="Close">×</button></h5><div id="si-body"></div></div>
+        </div>
+        <div class="sov-result">
+          <div class="res-top"><span class="res-title">Decision Record</span><span class="band IDLE" id="sov-band">AWAITING REQUEST</span></div>
+          <div class="res-line" id="sov-result-line">Select a profile and click <b>Route Request</b>. The engine evaluates all six gateways against your regulatory constraints.</div>
+          <div class="alert-box" id="sov-alert"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="formula" style="margin-top:20px">
+<span class="comment">// Expanded routing cost function</span>
+<span class="fn">J</span>(<span class="var">n</span>) = <span class="num">w₁</span>·<span class="fn">Cost</span>(<span class="var">n</span>) + <span class="num">w₂</span>·<span class="fn">Latency</span>(<span class="var">n</span>)
+       + <span class="num">w₃</span>·<span class="fn">GridCarbon</span>(<span class="var">n</span>) + <span class="var">Ω<sub>geo</sub></span>(<span class="var">n</span>, <span class="var">Φ</span>)
+
+<span class="var">Ω<sub>geo</sub></span>(<span class="var">n</span>, <span class="var">Φ</span>) = { <span class="num">0</span>,   if <span class="var">n</span> satisfies geopolitical policy <span class="var">Φ</span>
+             { <span class="num">∞</span>,   otherwise   <span class="comment">// hard constraint, not a penalty</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ §04 INTERVAL HYPERGRAPH ═══ -->
+<section class="sec" id="hypergraph">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§04</span><span class="ttl">weighted interval hypergraph</span><span class="rev">sovereignty axis · linear order</span></div>
+    <p class="secnote">Jurisdictions are linearly ordered on the sovereignty axis. Each routing decision is an <b>interval hyperedge</b> weighted by J(n). Hover any interval to inspect its cost composition.</p>
+    <div class="figure bracket inspect-wrap">
+      <canvas id="intervalCanvas" width="1100" height="280"></canvas>
+      <div class="flabel">FIG.3 // weighted interval hypergraph · hover an interval to inspect J(n)</div>
+      <div class="fcorner">APX-HL-EGRESS</div>
+      <div class="inspect-box" id="intInspector"><h5><span id="ii-name">Interval</span><button id="ii-close" aria-label="Close">×</button></h5><div id="ii-body"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ §05 EGRESS FEED ═══ -->
+<section class="sec" id="egress">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§05</span><span class="ttl">egress-commit ledger</span><span class="rev">APX-HL-EGRESS · synthetic stream</span></div>
+    <p class="secnote">Every routing decision commits to <b>APX-HL-EGRESS</b> as a directed hyperedge carrying a SPIFFE principal, geographic coordinates, and an attestation signature.</p>
+    <div class="feed">
+      <div class="feed-head"><span>APX-HL-EGRESS · COMMIT STREAM</span><span class="live">SYNTHETIC · LIVE</span></div>
+      <div class="feed-body" id="feedBody"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ §06 TIERS ═══ -->
 <section class="sec" id="tiers">
- <div class="wrap">
-  <div class="secmark"><span class="id">§08</span><span class="ttl">access tiers</span><span class="rev">one API surface · REV 1</span></div>
-  <p class="secnote">Four tiers, one routing surface. Every tier inherits the same deterministic guarantees — possibility floors, drift gating, and an auditable rationale on every decision.</p>
-  <div class="plans">
-   <div class="plan"><div class="pn">Developer</div><div class="pp">$0 <small>/ forever</small></div><ul><li>Routing NOC (basic)</li><li>live header telemetry</li><li>community support</li></ul></div>
-   <div class="plan"><div class="pn">Standard</div><div class="pp">$99 <small>/ mo</small></div><ul><li>full Routing NOC</li><li>drift telemetry</li><li>5M tokens/day</li></ul></div>
-   <div class="plan pop"><span class="pop-tag">POPULAR</span><div class="pn">Frontier</div><div class="pp">$499 <small>/ mo</small></div><ul><li>everything in Standard</li><li>SYS_PERF + FinOps deck</li><li>priority routing</li></ul></div>
-   <div class="plan"><div class="pn">Enterprise</div><div class="pp">custom</div><ul><li>SSO + dedicated nodes</li><li>on-prem CPS sharding</li><li>24/7 SLA</li></ul></div>
-  </div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §09 ECOSYSTEM -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="ecosystem">
- <div class="wrap">
-  <div class="secmark"><span class="id">§09</span><span class="ttl">the ecosystem</span><span class="rev">three layers, one control plane · LIVE</span></div>
-  <p class="secnote">A.R.E. is the <b>decision layer</b> of a three-layer control plane. AperX provides provenance and execution proofs beneath it; the Enterprise NOC operates it. You are on the routing engine now.</p>
-
-  <div class="layermarks">
-   <div class="lm" onclick="window.open('https://ultramassiveml.io','_blank')">
-    <div class="lm-logo"><svg viewBox="0 0 64 64"><use href="#um-logo-mark"/></svg></div>
-    <div class="lmn">ULTRAMASSIVE</div><div class="lmu">ultramassiveml.io</div>
-    <div class="lm-color-bar"><span class="c-green"></span><span class="c-blue"></span><span class="c-orange"></span></div>
-   </div>
-   <div class="lm you" onclick="location.hash='#top'">
-    <span class="you-badge">YOU ARE HERE</span>
-    <div class="lm-logo"><svg viewBox="0 0 64 64"><use href="#um-logo-are"/></svg></div>
-    <div class="lmn">A.R.E. ENGINE</div><div class="lmu">ultramassive.ml</div>
-    <div class="lm-color-bar"><span class="c-blue"></span><span class="c-green"></span><span class="c-orange"></span></div>
-   </div>
-   <div class="lm" onclick="window.open('https://aperx.ultramassiveml.io','_blank')">
-    <div class="lm-logo"><svg viewBox="0 0 64 64"><use href="#um-logo-aperx"/></svg></div>
-    <div class="lmn">APERX</div><div class="lmu">aperx.ultramassiveml.io</div>
-    <div class="lm-color-bar"><span class="c-green"></span><span class="c-blue"></span><span class="c-orange"></span></div>
-   </div>
-   <div class="lm" onclick="window.open('https://ultramassiveml.io#noc','_blank')">
-    <div class="lm-logo"><svg viewBox="0 0 64 64"><use href="#um-logo-noc"/></svg></div>
-    <div class="lmn">ENTERPRISE NOC</div><div class="lmu">14 telemetry decks</div>
-    <div class="lm-color-bar"><span class="c-orange"></span><span class="c-green"></span><span class="c-blue"></span></div>
-   </div>
-  </div>
-
-  <div class="color-legend">
-   <span class="cl-item"><span class="cl-swatch cl-green"></span>AperX · provenance</span>
-   <span class="cl-item"><span class="cl-swatch cl-blue"></span>A.R.E. · reasoning</span>
-   <span class="cl-item"><span class="cl-swatch cl-orange"></span>NOC · operations</span>
-   <span class="cl-item"><span class="cl-swatch cl-frame"></span>infrastructure</span>
-  </div>
- </div>
-</section>
-
-<!-- ══════════════════════════════════════════════════════ -->
-<!-- §10 CONTACT -->
-<!-- ══════════════════════════════════════════════════════ -->
-<section class="sec" id="contact">
- <div class="wrap">
-  <div class="secmark"><span class="id">§10</span><span class="ttl">contact</span><span class="rev">bring us your hardest routing problem · REV 2</span></div>
-  <div class="memowrap" style="margin-top:12px">
-   <div>
-    <dl class="fields" style="max-width:520px">
-     <div class="row"><dt>email</dt><dd><a href="mailto:contact@ultramassiveml.io">contact@ultramassiveml.io</a></dd></div>
-     <div class="row"><dt>phone</dt><dd>+1 202.709.9701</dd></div>
-     <div class="row"><dt>engine</dt><dd>ultramassive.ml</dd></div>
-     <div class="row"><dt>nda</dt><dd><a href="#" onclick="event.preventDefault();_openNDA()">execute mutual NDA →</a></dd></div>
-    </dl>
-    <div class="signoff" style="margin-top:26px">
-     <b>autosymbotic division</b><br>
-     UltraMassive Advanced Scientific Research Corp<br>
-     Detroit, Michigan · USA<br>
-     <span style="color:var(--ink3)">CVE / MBE · UEI M56HEXXMJC47 · CAGE 22QR2</span>
+  <div class="wrap">
+    <div class="secmark"><span class="id">§06</span><span class="ttl">tier selection matrix</span><span class="rev">NANO · STANDARD · FRONTIER</span></div>
+    <p class="secnote">Three tiers, one deterministic selector. The cheapest tier satisfying the necessity floor wins.</p>
+    <div class="tiermatrix">
+      <div class="tier" style="--tcol:var(--ok)"><div class="tnum">Tier I · NANO</div><h4>Lightweight Routing</h4><p>Classification, extraction, simple routing. Carbon-optimal.</p><div class="tspecs"><b>Capability:</b> 0.30<br><b>Cost:</b> $0.10 / 1K tokens<br><b>P99:</b> &lt;50ms<br><b>Models:</b> Llama-3.2-1B, Phi-3-mini</div></div>
+      <div class="tier" style="--tcol:var(--link)"><div class="tnum">Tier II · STANDARD</div><h4>Balanced Routing</h4><p>General inference, summarization, code generation.</p><div class="tspecs"><b>Capability:</b> 0.70<br><b>Cost:</b> $0.50 / 1K tokens<br><b>P99:</b> &lt;200ms<br><b>Models:</b> Llama-3.1-70B, Mistral-Large</div></div>
+      <div class="tier" style="--tcol:var(--amber)"><div class="tnum">Tier III · FRONTIER</div><h4>High-Capability Routing</h4><p>Complex reasoning, long-context, agentic tasks.</p><div class="tspecs"><b>Capability:</b> 0.95<br><b>Cost:</b> $1.00 / 1K tokens<br><b>P99:</b> &lt;500ms<br><b>Models:</b> Llama-3.1-405B, Claude-3.5-Sonnet</div></div>
     </div>
-   </div>
   </div>
- </div>
 </section>
 
-<!-- ══ FOOTER ══ -->
+<!-- ═══ §07 CONTACT ═══ -->
+<section class="sec" id="contact">
+  <div class="wrap">
+    <div class="secmark"><span class="id">§07</span><span class="ttl">contact</span><span class="rev">bring us your hardest routing problem</span></div>
+    <dl class="fields" style="max-width:540px">
+      <div class="row"><dt>email</dt><dd><a href="mailto:contact@ultramassiveml.io">contact@ultramassiveml.io</a></dd></div>
+      <div class="row"><dt>phone</dt><dd>+1 202.709.9701</dd></div>
+      <div class="row"><dt>engine</dt><dd>ultramassive.ml</dd></div>
+      <div class="row"><dt>ecosystem</dt><dd>ultramassiveml.io · aperx.ultramassiveml.io</dd></div>
+    </dl>
+    <div class="signoff"><b>autosymbotic division</b><br>UltraMassive Advanced Scientific Research Corp<br>Detroit, Michigan · USA<br><span style="color:var(--ink3)">CVE / MBE · UEI M56HEXXMJC47 · CAGE 22QR2</span></div>
+  </div>
+</section>
+
 <footer class="foot">
- <div class="wrap fgrid">
-  <div>
-   <div class="brandline">
-    <svg viewBox="0 0 64 64"><use href="#um-logo-are"/></svg>
-    <span class="bl-txt">ULTRAMASSIVE.ML // A.R.E.<span class="bl-sub">autotelic routing engine · decision layer</span></span>
-   </div>
-   <p>Route every request to the cheapest tier that can answer it. Possibility-calibrated, carbon-aware, and explainable — with dissent escalation and egress enforcement for the agentic era.</p>
-   <p style="color:var(--ink3);margin-top:8px">Combat-Related Disabled Veteran & Minority Owned Small Business · Detroit, MI</p>
+  <div class="wrap fgrid">
+    <div>
+      <div class="brandline"><svg viewBox="0 0 64 64"><use href="#um-are"/></svg><span>ULTRAMASSIVE.ML // A.R.E.<span class="bl-sub">autotelic routing engine</span></span></div>
+      <p>Route, do not guess. Attest, do not hope. Every inference request becomes a routed, scored, and attested decision — deterministic, sovereign-aware, replayable.</p>
+      <p style="color:var(--ink3);margin-top:8px">Combat-Related Disabled Veteran & Minority Owned Small Business · Detroit, MI</p>
+    </div>
+    <div><h5>Ecosystem</h5><a href="https://ultramassiveml.io" target="_blank">Control Plane</a><a href="https://aperx.ultramassiveml.io" target="_blank">AperX Ledger</a><a href="#sovereign">Sovereign Routing</a></div>
+    <div><h5>Resources</h5><a href="#" onclick="event.preventDefault()">White Papers</a><a href="https://github.com/UltraMassive-ML" target="_blank">GitHub</a><a href="#" onclick="event.preventDefault()">API Docs</a></div>
+    <div><h5>Company</h5><a href="#contact">Contact</a><a href="#">Press</a><a href="#">Security</a></div>
+    <div class="fcopy"><span>© 2026 ULTRAMASSIVE ADVANCED SCIENTIFIC RESEARCH CORP · ALL DECISIONS COMMITTED ON APX-HL-EGRESS</span><span>UEI M56HEXXMJC47 · CAGE 22QR2</span></div>
   </div>
-  <div>
-   <h5>Engine</h5>
-   <a href="#engine">Routing pipeline</a>
-   <a href="#simulator">Routing simulator</a>
-   <a href="#sharding">Prompt sharding</a>
-   <a href="#carbon">Carbon-cost matrix</a>
-  </div>
-  <div>
-   <h5>Agentic surface</h5>
-   <a href="#agentic">Dissent routing</a>
-   <a href="#agentic">Egress air-gap</a>
-   <a href="#tech">Core technologies</a>
-  </div>
-  <div>
-   <h5>Ecosystem</h5>
-   <a href="https://ultramassiveml.io" target="_blank">UltraMassive.IO ↗</a>
-   <a href="https://aperx.ultramassiveml.io" target="_blank">AperX ↗</a>
-   <a href="#" onclick="event.preventDefault();_openNDA()">Two-Way NDA</a>
-   <a href="https://github.com/UltraMassive-ML" target="_blank">GitHub ↗</a>
-  </div>
-  <div class="fcopy">
-   <span>© 2026 ULTRAMASSIVE ADVANCED SCIENTIFIC RESEARCH CORP · A.R.E. DECISION LAYER</span>
-   <span>UEI M56HEXXMJC47 · CAGE 22QR2 · NAICS 541511/541512/541715/518210/541690</span>
-  </div>
- </div>
 </footer>
 
-<!-- ══ NDA MODAL ══ -->
-<div class="modal" id="ndaModal">
- <div class="mcard">
-  <button class="mclose" onclick="_closeNDA()">×</button>
-  <h3>Symbiotic Architecture Two-Way NDA</h3>
-  <div class="msub">UM-MNDA-2026.07-v2.0 · counsel-reviewed</div>
-  <p>Mutual Non-Disclosure Agreement between <b>UltraMassive Advanced Scientific Research Corp</b> and the <b>Authenticated Principal</b>. Covers routing internals, possibility-band calibration, sharding schemes, egress policy, and agentic governance subsystems.</p>
-  <p style="font-size:12.5px">By executing, you consent to a SHA-256 hash being appended to the <b>APX-HL-NDA</b> ledger as a non-repudiable directed hyperedge.</p>
-  <div class="hashstream" id="ndaHash">sha256: —</div>
-  <div class="btnrow" style="justify-content:flex-end">
-   <button class="btn" onclick="_closeNDA()">cancel</button>
-   <button class="btn pri" onclick="_signNDA()">execute NDA & unlock</button>
-  </div>
- </div>
-</div>
-
 <script>
-/* scramble */
-(function(){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
- var GL="ABCDEFGHJKLMNPQRSTUVWXYZ0123456789/#@%&";
- function scramble(el){var txt=el.getAttribute("data-final")||el.textContent;el.setAttribute("data-final",txt);var frame=0,dur=Math.min(txt.length*2+20,60);
-  function tick(){var out="";for(var i=0;i<txt.length;i++){var c=txt[i];if(c===" "||c==="\n"){out+=c;continue}var rev=(i/txt.length)*dur;if(frame>=rev+8)out+=c;else out+=GL[(Math.random()*GL.length)|0]}el.textContent=out;frame++;if(frame<dur+10)requestAnimationFrame(tick);else el.textContent=txt}tick()}
- var sio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){scramble(e.target);sio.unobserve(e.target)}})},{threshold:.4});
- document.querySelectorAll("[data-scramble]").forEach(function(el){sio.observe(el)})})();
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function hexa(h,a){h=h.trim();if(h[0]!=="#")return h;var n=h.slice(1);if(n.length===3)n=n.split("").map(function(c){return c+c}).join("");return"rgba("+parseInt(n.slice(0,2),16)+","+parseInt(n.slice(2,4),16)+","+parseInt(n.slice(4,6),16)+","+a+")"}
+function hexStr(n){var o="";for(var i=0;i<n;i++)o+="0123456789abcdef"[Math.floor(Math.random()*16)];return o}
+function fit(id){var c=document.getElementById(id);if(!c)return null;var ctx=c.getContext("2d"),D=Math.min(window.devicePixelRatio||1,2);var W=c.clientWidth||c.parentElement.clientWidth,H=c.clientHeight||parseInt(c.getAttribute("height"))||280;c.width=W*D;c.height=H*D;ctx.setTransform(D,0,0,D,0,0);return{c:c,ctx:ctx,W:W,H:H,D:D}}
 
-/* spotlight */
-document.querySelectorAll(".memo").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");m.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%")})});
-
-/* nav indicator + scroll-spy */
-(function(){var box=document.querySelector(".navlinks");if(!box)return;var ind=document.createElement("span");ind.className="navind";box.appendChild(ind);
- function move(a){if(!a){ind.style.opacity=0;return}var r=a.getBoundingClientRect(),br=box.getBoundingClientRect();ind.style.left=(r.left-br.left)+"px";ind.style.width=r.width+"px";ind.style.opacity=1}
- box.querySelectorAll("a").forEach(function(a){a.addEventListener("mouseenter",function(){move(a)})});
- box.addEventListener("mouseleave",function(){move(box.querySelector("a.active"))});
- window._navActive=function(){move(box.querySelector("a.active"))};setTimeout(function(){move(box.querySelector("a.active"))},60)})();
-var _secs=[].slice.call(document.querySelectorAll("section[id], header[id]"));
-var _spy=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var id=e.target.id;
- document.querySelectorAll(".navlinks a").forEach(function(a){a.classList.toggle("active",a.getAttribute("href")==="#"+id)});if(window._navActive)window._navActive()}})},{rootMargin:"-40% 0px -55% 0px"});
-_secs.forEach(function(s){_spy.observe(s)});
-
-/* progress */
-var _pb=document.querySelector(".progress i");
-window.addEventListener("scroll",function(){var h=document.documentElement,st=h.scrollTop,sh=h.scrollHeight-h.clientHeight;if(_pb)_pb.style.width=(sh>0?st/sh*100:0)+"%"},{passive:true});
-
-/* atomic clock */
-(function(){var off=0,synced=false;
- function p(n){return(n<10?"0":"")+n}
+/* CLOCK */
+(function(){var off=0,synced=false;function p(n){return(n<10?"0":"")+n}
  function fmt(d){return d.getUTCFullYear()+"."+p(d.getUTCMonth()+1)+"."+p(d.getUTCDate())+"  "+p(d.getUTCHours())+":"+p(d.getUTCMinutes())+":"+p(d.getUTCSeconds())}
- function tick(){var el=document.getElementById("clock");if(el)el.textContent=fmt(new Date(Date.now()+off))+" UTC";var s=document.getElementById("csync");if(s){s.textContent=synced?"ATOMIC":"LOCAL";s.className="sync "+(synced?"ok":"loc")}}
+ function tick(){var el=document.getElementById("clock");if(el)el.textContent=fmt(new Date(Date.now()+off))+" UTC";var s=document.getElementById("csync");if(s){s.textContent=synced?"ATOMIC":"LOCAL";s.className="sync"+(synced?" ok":"")}}
  setInterval(tick,1000);tick();
- function sync(u,pr){return fetch(u,{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){var t=pr(j);if(t){off=t-Date.now();synced=true;tick()}return true})}
- sync("https://worldtimeapi.org/api/timezone/Etc/UTC",function(j){return j&&j.unixtime?j.unixtime*1000:(j&&j.utc_datetime?Date.parse(j.utc_datetime):0)})
- .catch(function(){return sync("https://timeapi.io/api/Time/current/zone?timeZone=UTC",function(j){return j&&j.dateTime?Date.parse(j.dateTime.replace(/Z?$/,"Z")):0})})
- .catch(function(){});
-})();
+ fetch("https://worldtimeapi.org/api/timezone/Etc/UTC",{cache:"no-store"}).then(function(r){return r.json()}).then(function(j){if(j&&j.unixtime){off=j.unixtime*1000-Date.now();synced=true;tick()}}).catch(function(){})})();
 
-/* theme */
+/* THEME */
 (function(){var b=document.getElementById("themeBtn"),i=document.getElementById("themeIco");
  var saved=localStorage.getItem("um-theme");if(saved)document.documentElement.setAttribute("data-theme",saved);
  function upd(){var d=document.documentElement.getAttribute("data-theme")==="dark";
@@ -932,253 +705,361 @@ window.addEventListener("scroll",function(){var h=document.documentElement,st=h.
  upd();
  b.addEventListener("click",function(){var c=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";document.documentElement.setAttribute("data-theme",c);localStorage.setItem("um-theme",c);upd()})})();
 
-/* tabs / copy / burger */
-document.querySelectorAll(".tabs").forEach(function(t){var btns=t.querySelectorAll(".tabbtn"),pans=t.querySelectorAll(".panel");
- btns.forEach(function(b){b.addEventListener("click",function(){var k=b.dataset.tab;btns.forEach(function(x){x.classList.toggle("active",x===b)});pans.forEach(function(p){p.classList.toggle("active",p.dataset.panel===k)})})})});
-document.querySelectorAll("[data-copy]").forEach(function(b){b.addEventListener("click",function(){var sel=b.dataset.copy,txt=sel?document.querySelector(sel).innerText:"";navigator.clipboard.writeText(txt).then(function(){var o=b.textContent;b.textContent="copied";setTimeout(function(){b.textContent=o},1200)})})});
+/* SCRAMBLE */
+(function(){if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+ var GL="ABCDEFGHJKLMNPQRSTUVWXYZ0123456789/#@%&";
+ function scramble(el){var txt=el.getAttribute("data-final")||el.textContent;el.setAttribute("data-final",txt);var frame=0,dur=Math.min(txt.length*2+20,60);
+  function tick(){var out="";for(var i=0;i<txt.length;i++){var c=txt[i];if(c===" "||c==="\n"){out+=c;continue}var rev=(i/txt.length)*dur;out+=frame>=rev+8?c:GL[Math.floor(Math.random()*GL.length)]}el.textContent=out;frame++;if(frame<dur+10)requestAnimationFrame(tick);else el.textContent=txt}tick()}
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){scramble(e.target);io.unobserve(e.target)}})},{threshold:.4});
+ document.querySelectorAll("[data-scramble]").forEach(function(el){io.observe(el)})})();
+
+/* NAV */
+(function(){var box=document.querySelector(".navlinks");if(!box)return;var ind=document.createElement("span");ind.className="navind";box.appendChild(ind);
+ function move(a){if(!a){ind.style.opacity=0;return}var r=a.getBoundingClientRect(),br=box.getBoundingClientRect();ind.style.left=(r.left-br.left)+"px";ind.style.width=r.width+"px";ind.style.opacity=1}
+ box.querySelectorAll("a").forEach(function(a){a.addEventListener("mouseenter",function(){move(a)})});
+ box.addEventListener("mouseleave",function(){move(box.querySelector("a.active"))});
+ window._navActive=function(){move(box.querySelector("a.active"))};setTimeout(function(){move(box.querySelector("a.active"))},80);
+ var spy=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var id=e.target.id;box.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("href")==="#"+id)});if(window._navActive)window._navActive()}})},{rootMargin:"-35% 0px -55% 0px"});
+ document.querySelectorAll("section[id],header[id]").forEach(function(s){spy.observe(s)})})();
 window._toggleNav=function(){document.querySelector(".navlinks").classList.toggle("open")};
+document.querySelectorAll(".hero").forEach(function(m){m.addEventListener("pointermove",function(e){var r=m.getBoundingClientRect();m.style.setProperty("--mx",((e.clientX-r.left)/r.width*100)+"%");m.style.setProperty("--my",((e.clientY-r.top)/r.height*100)+"%")})});
 
-/* sha256 + NDA */
-function _sha(s){return crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)).then(function(b){return[].slice.call(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
-function _openNDA(){document.getElementById("ndaModal").classList.add("open");
- _sha("UM-MNDA-2026.07-v2.0::"+Date.now()+"::"+Math.random()).then(function(h){document.getElementById("ndaHash").textContent="sha256:"+h})}
-function _closeNDA(){document.getElementById("ndaModal").classList.remove("open")}
-function _signNDA(){var h=document.getElementById("ndaHash").textContent.replace("sha256:","");
- alert("NDA executed · edge committed on APX-HL-NDA\n\n"+h+"\n\nRouting internals and ProtoLab unlocked.");_closeNDA()}
-window._openNDA=_openNDA;window._closeNDA=_closeNDA;window._signNDA=_signNDA;
+/* LIVE METRICS */
+(function(){var rps=2847,p99=142;setInterval(function(){rps=Math.max(2400,Math.min(3200,rps+Math.floor(Math.random()*200-100)));p99=Math.max(110,Math.min(190,p99+Math.floor(Math.random()*20-10)));
+ var r=document.getElementById("s-rps"),p=document.getElementById("s-p99");if(r)r.textContent=rps.toLocaleString();if(p)p.textContent=p99},2400)})();
 
-/* live header metrics */
-(function(){var hit=94.2,drift=.041,arb=23;
- setInterval(function(){
-  hit=Math.max(88,Math.min(99,hit+(Math.random()*.6-.3)));
-  drift=Math.max(.012,Math.min(.085,drift+(Math.random()*.008-.004)));
-  arb=Math.max(8,Math.min(38,arb+(Math.random()*2-1)));
-  document.getElementById("s-hit").textContent=hit.toFixed(1)+"%";
-  document.getElementById("s-drift").textContent=drift.toFixed(3);
-  document.getElementById("s-arb").textContent=arb.toFixed(0)+"%";
-  document.getElementById("st-hit").innerHTML=hit.toFixed(1)+'<span class="suf">%</span>';
- },2200)})();
-
-/* hero canvas */
-(function(){var c=document.getElementById("herocv");if(!c||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-var mode=c.getAttribute("data-mode")||"plexus",x=c.getContext("2d"),W,H,D=Math.min(devicePixelRatio||1,2),ns=[],hy=[],tk=0,col={};
-function theme(){var s=getComputedStyle(document.documentElement);col.node=s.getPropertyValue("--ink").trim();col.line=s.getPropertyValue("--steel").trim();col.acc=s.getPropertyValue("--acc").trim()}
-function hexa(h,a){h=h.trim();if(h[0]!=="#")return h;var n=h.slice(1);if(n.length===3)n=n.split("").map(function(c){return c+c}).join("");var r=parseInt(n.slice(0,2),16),g=parseInt(n.slice(2,4),16),b=parseInt(n.slice(4,6),16);return"rgba("+r+","+g+","+b+","+a+")"}
-function rs(){W=c.clientWidth;H=c.clientHeight;c.width=W*D;c.height=H*D;x.setTransform(D,0,0,D,0,0);theme();
- var N=Math.max(16,Math.min(mode==="hyper"?32:40,Math.floor(W/24)));ns=[];for(var i=0;i<N;i++)ns.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.22,vy:(Math.random()-.5)*.22,r:Math.random()*1.4+1})}
-rs();addEventListener("resize",rs);
-new MutationObserver(theme).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
-function spawn(){if(ns.length<5)return;var a=ns[(Math.random()*ns.length)|0];var near=ns.slice().sort(function(p,q){return((p.x-a.x)**2+(p.y-a.y)**2)-((q.x-a.x)**2+(q.y-a.y)**2)}).slice(0,3+((Math.random()*2)|0));hy.push({s:near,l:0,m:220+Math.random()*140});if(hy.length>3)hy.shift()}
-function draw(){x.clearRect(0,0,W,H);
- for(var i=0;i<ns.length;i++){var a=ns[i];a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>W)a.vx*=-1;if(a.y<0||a.y>H)a.vy*=-1;
-  for(var j=i+1;j<ns.length;j++){var b=ns[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);if(d<120){x.strokeStyle=hexa(col.line,.16*(1-d/120));x.lineWidth=1;x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}}}
- if(mode==="hyper"){for(var h=hy.length-1;h>=0;h--){var e=hy[h];e.l++;var t=e.l/e.m,al=Math.sin(Math.min(t,1)*Math.PI)*.5;var p=e.s.map(function(n){return{x:n.x,y:n.y}});
-   var cx=p.reduce(function(s,q){return s+q.x},0)/p.length,cy=p.reduce(function(s,q){return s+q.y},0)/p.length;
-   p.sort(function(u,v){return Math.atan2(u.y-cy,u.x-cx)-Math.atan2(v.y-cy,v.x-cx)});x.beginPath();
-   for(var k=0;k<p.length;k++){var q=p[k],ex=cx+(q.x-cx)*1.3,ey=cy+(q.y-cy)*1.3;if(k===0)x.moveTo(ex,ey);else x.lineTo(ex,ey)}x.closePath();
-   x.fillStyle=hexa(col.acc,al*.07);x.strokeStyle=hexa(col.acc,al*.55);x.lineWidth=1.1;x.fill();x.stroke()}}
- for(var n=0;n<ns.length;n++){var d2=ns[n];x.beginPath();x.arc(d2.x,d2.y,d2.r,0,7);x.fillStyle=hexa(col.node,.55);x.fill()}
- tk++;if(mode==="hyper"&&tk%80===0)spawn();requestAnimationFrame(draw)}draw()})();
-
-/* ROUTING SIMULATOR */
+/* ═══════════════════════════════════════════════════════
+   THE DECISION SEAL — interactive tier dispatch engine
+═══════════════════════════════════════════════════════ */
 (function(){
- var cx=document.getElementById("cx"),lm=document.getElementById("lm"),ta=document.getElementById("ta"),tc=document.getElementById("tc");
- var tiers=[{n:"NANO",cap:.30,cost:.10,col:"var(--ok)"},{n:"STANDARD",cap:.70,cost:.50,col:"var(--warn)"},{n:"FRONTIER",cap:.95,cost:1.00,col:"var(--acc)"}];
+  var NS="http://www.w3.org/2000/svg";
+  var CX=200,CY=200,R=128;
+  var tiers=[
+    {n:"NANO",    css:"var(--ok)",    cap:.30,cost:.10,angle:150},
+    {n:"STANDARD",css:"var(--link)",  cap:.70,cost:.50,angle:30},
+    {n:"FRONTIER",css:"var(--amber)", cap:.95,cost:1.00,angle:-90}
+  ];
+  tiers.forEach(function(t){t.x=CX+R*Math.cos(t.angle*Math.PI/180);t.y=CY+R*Math.sin(t.angle*Math.PI/180);t.load=0});
+  tiers[0].load=34;tiers[1].load=52;tiers[2].load=21;
+
+  var distG=document.getElementById("sealDist");
+  var packetsG=document.getElementById("sealPackets");
+  var packets=[];
+  var totalRouted=tiers[0].load+tiers[1].load+tiers[2].load;
+  var totalEgress=Math.floor(totalRouted*.98);
+  var verts=document.querySelectorAll(".seal-vertex");
+
+  function arcPath(a1,a2,r){
+    var x1=CX+r*Math.cos(a1),y1=CY+r*Math.sin(a1);
+    var x2=CX+r*Math.cos(a2),y2=CY+r*Math.sin(a2);
+    var large=(a2-a1)>Math.PI?1:0;
+    return "M "+x1.toFixed(2)+" "+y1.toFixed(2)+" A "+r+" "+r+" 0 "+large+" 1 "+x2.toFixed(2)+" "+y2.toFixed(2);
+  }
+  function renderDist(){
+    while(distG.firstChild)distG.removeChild(distG.firstChild);
+    var total=tiers.reduce(function(s,t){return s+t.load},0)||1;
+    var start=-Math.PI/2;
+    tiers.forEach(function(t){
+      var frac=t.load/total;if(frac<=0.001)return;
+      var end=start+frac*2*Math.PI;
+      var p=document.createElementNS(NS,"path");
+      p.setAttribute("d",arcPath(start+.02,end-.02,158));
+      p.setAttribute("fill","none");p.setAttribute("stroke",t.css);
+      p.setAttribute("stroke-width","10");p.setAttribute("stroke-linecap","round");
+      p.setAttribute("opacity",".8");
+      distG.appendChild(p);
+      start=end;
+    });
+  }
+  function updateHub(t,reqId){
+    document.getElementById("sealTier").textContent=t.n;
+    document.getElementById("sealPiNi").textContent="Π "+t.cap.toFixed(2)+" · N "+Math.max(0,t.cap-.2).toFixed(2);
+    document.getElementById("sealLast").textContent=reqId;
+  }
+  function updateTelemetry(){
+    var total=tiers.reduce(function(s,t){return s+t.load},0)||1;
+    document.getElementById("tel-total").textContent=totalRouted.toLocaleString();
+    document.getElementById("tel-egress").textContent=totalEgress.toLocaleString();
+    var lat=document.getElementById("tel-lat");
+    if(lat)lat.innerHTML=(120+Math.floor(Math.random()*60))+'<span class="suf">ms</span>';
+    var hit=document.getElementById("tel-hit");
+    if(hit)hit.innerHTML=(92+Math.random()*4).toFixed(1)+'<span class="suf">%</span>';
+    var ids=["nano","standard","frontier"];
+    tiers.forEach(function(t,i){
+      var share=(t.load/total*100);
+      document.getElementById("bar-"+ids[i]).style.width=share+"%";
+      document.getElementById("count-"+ids[i]).textContent=t.load+" · "+share.toFixed(0)+"%";
+    });
+  }
+  function logDispatch(t,reqId,manual){
+    var log=document.getElementById("dispatchLog");if(!log)return;
+    var time=new Date().toISOString().slice(11,19);
+    var colCss=t.css;
+    var d=document.createElement("div");d.className="dl-row";
+    d.innerHTML='<span class="t">'+time+'</span><span class="m"><b>'+reqId+'</b> → '+(manual?'manual':'auto')+'</span>'+
+      '<span class="tier-tag" style="background:color-mix(in srgb,'+colCss+' 18%,transparent);color:'+colCss+';border:1px solid color-mix(in srgb,'+colCss+' 40%,transparent)">'+t.n+'</span>';
+    log.insertBefore(d,log.firstChild);
+    while(log.children.length>10)log.removeChild(log.lastChild);
+  }
+  function flashVertex(idx){
+    var v=verts[idx];if(!v)return;
+    v.classList.add("flash");
+    setTimeout(function(){v.classList.remove("flash")},420);
+  }
+  function dispatch(idx,manual){
+    var t=tiers[idx];
+    var reqId="req-"+hexStr(4);
+    totalRouted++;
+    var pkt=document.createElementNS(NS,"circle");
+    pkt.setAttribute("r","5");pkt.setAttribute("fill",t.css);
+    pkt.setAttribute("cx",CX);pkt.setAttribute("cy",CY);
+    packetsG.appendChild(pkt);
+    packets.push({el:pkt,tier:idx,prog:0,speed:.022});
+    updateHub(t,reqId);
+    logDispatch(t,reqId,manual);
+    flashVertex(idx);
+    if(window.pushFeed)window.pushFeed({msg:"<b>"+reqId+"</b> → seal dispatch · <b>"+t.n+"</b> · cap "+t.cap.toFixed(2),status:"ok",label:"COMMITTED"});
+  }
+  function arrive(idx){
+    tiers[idx].load++;totalEgress++;
+    renderDist();updateTelemetry();
+  }
+  function step(){
+    for(var i=packets.length-1;i>=0;i--){
+      var p=packets[i];p.prog+=p.speed;
+      var t=tiers[p.tier];
+      var e=Math.min(1,p.prog);
+      var u=e*e*(3-2*e);
+      var x=CX+(t.x-CX)*u,y=CY+(t.y-CY)*u;
+      p.el.setAttribute("cx",x);p.el.setAttribute("cy",y);
+      if(p.prog>=1){p.el.setAttribute("cx",t.x);p.el.setAttribute("cy",t.y);p.el.setAttribute("opacity",Math.max(0,1-(p.prog-1)/.25));}
+      if(p.prog>=1.25){p.el.remove();packets.splice(i,1);arrive(p.tier);}
+    }
+    requestAnimationFrame(step);
+  }
+  verts.forEach(function(v,i){
+    v.addEventListener("click",function(){dispatch(i,true)});
+    v.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();dispatch(i,true)}});
+  });
+  renderDist();updateTelemetry();step();
+  var visible=false;
+  var io=new IntersectionObserver(function(es){visible=es[0].isIntersecting},{threshold:.2});
+  io.observe(document.querySelector(".seal-wrap"));
+  setInterval(function(){if(!visible||document.hidden)return;if(Math.random()<.65)dispatch(Math.floor(Math.random()*3),false)},2600);
+})();
+
+/* ═══ FIG.1 HERO CANVAS ═══ */
+(function(){var s=fit("heroCanvas");if(!s)return;var ctx=s.ctx,W=s.W,H=s.H;
+ var input={x:44,y:H/2};
+ var tiers=[{x:W*.44,y:H*.24,name:"NANO",col:"--ok"},{x:W*.44,y:H*.5,name:"STANDARD",col:"--link"},{x:W*.44,y:H*.76,name:"FRONTIER",col:"--amber"}];
+ var sink={x:W-60,y:H/2};var packets=[];var last=0;
+ function draw(){ctx.clearRect(0,0,W,H);var now=Date.now();var ink=cssv("--ink"),mut=cssv("--ink3");
+  ctx.strokeStyle=cssv("--link");ctx.lineWidth=1.5;ctx.strokeRect(input.x-13,input.y-13,26,26);
+  ctx.fillStyle=cssv("--link");ctx.font='700 8px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText("REQ",input.x,input.y+3);
+  ctx.fillStyle=mut;ctx.font='500 8px "JetBrains Mono",monospace';ctx.fillText("INGRESS",input.x,input.y+30);
+  tiers.forEach(function(t){var col=cssv(t.col);
+   ctx.fillStyle=hexa(col,.1);ctx.beginPath();ctx.arc(t.x,t.y,20,0,7);ctx.fill();
+   ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(t.x,t.y,13,0,7);ctx.stroke();
+   ctx.fillStyle=col;ctx.beginPath();ctx.arc(t.x,t.y,4,0,7);ctx.fill();
+   ctx.fillStyle=ink;ctx.font='700 9px "JetBrains Mono",monospace';ctx.textAlign="left";ctx.fillText(t.name,t.x+30,t.y+3);
+   ctx.strokeStyle=hexa(col,.25);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(t.x+22,t.y);ctx.quadraticCurveTo((t.x+sink.x)/2,t.y,sink.x-14,sink.y);ctx.stroke();});
+  ctx.strokeStyle=cssv("--steel");ctx.lineWidth=1.2;ctx.strokeRect(sink.x-14,sink.y-18,28,36);
+  ctx.fillStyle=mut;ctx.font='700 7px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText("APX",sink.x,sink.y-2);ctx.fillText("HL",sink.x,sink.y+8);
+  ctx.fillStyle=mut;ctx.font='500 8px "JetBrains Mono",monospace';ctx.fillText("COMMIT",sink.x,sink.y+34);
+  if(now-last>650){packets.push({t:0,ti:Math.floor(Math.random()*3),speed:.006+Math.random()*.004,phase:0});last=now}
+  for(var i=packets.length-1;i>=0;i--){var p=packets[i];var t=tiers[p.ti];var col=cssv(t.col);
+   if(p.phase===0){p.t+=p.speed;if(p.t>=1){p.t=1;p.phase=1}var u=p.t;var cx=(input.x+t.x)/2;
+    var px=(1-u)*(1-u)*input.x+2*(1-u)*u*cx+u*u*t.x;var py=(1-u)*(1-u)*input.y+2*(1-u)*u*input.y+u*u*t.y;
+    ctx.fillStyle=col;ctx.beginPath();ctx.arc(px,py,3.5,0,7);ctx.fill();
+    ctx.strokeStyle=hexa(col,.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(px,py,7,0,7);ctx.stroke();}
+   else{p.t+=p.speed*1.3;if(p.t>=1){packets.splice(i,1);continue}var u2=p.t;var mx=(t.x+sink.x)/2;
+    var px2=(1-u2)*(1-u2)*t.x+2*(1-u2)*u2*mx+u2*u2*sink.x;var py2=(1-u2)*(1-u2)*t.y+2*(1-u2)*u2*t.y+u2*u2*sink.y;
+    ctx.fillStyle=hexa(col,.8);ctx.beginPath();ctx.arc(px2,py2,2.5,0,7);ctx.fill();}}
+  ctx.fillStyle=hexa(ink,.18);for(var k=0;k<14;k++){var x=(k*97+now*.008)%W;var y=H/2+Math.sin(k*1.7+now*.0004)*(H*.4);ctx.beginPath();ctx.arc(x,y,1.2,0,7);ctx.fill();}
+  requestAnimationFrame(draw)}
+ draw();
+ window.addEventListener("resize",function(){var n=fit("heroCanvas");if(n){W=n.W;H=n.H;ctx=n.ctx;input.y=H/2;tiers.forEach(function(t,i){t.x=W*.44;t.y=H*(.24+i*.26)});sink.x=W-60;sink.y=H/2;packets=[]}});
+})();
+
+/* ═══ Π/N CALIBRATION ═══ */
+(function(){var cx=document.getElementById("cx"),lm=document.getElementById("lm"),ta=document.getElementById("ta");if(!cx)return;
+ var tiers=[{n:"NANO",cap:.3,cost:.1,col:"var(--ok)"},{n:"STANDARD",cap:.7,cost:.5,col:"var(--link)"},{n:"FRONTIER",cap:.95,cost:1,col:"var(--amber)"}];
  var grid=document.getElementById("tierGrid");
- function upd(){
-  var x=cx.value/100,l=lm.value/100,t=ta.value/100;
-  document.getElementById("cx-v").textContent=x.toFixed(2);
-  document.getElementById("lm-v").textContent=l.toFixed(2);
-  document.getElementById("ta-v").textContent=t.toFixed(2);
-  var pi=x,ni=Math.max(0,pi-0.2);
-  document.getElementById("pi-r").textContent=pi.toFixed(2);
-  document.getElementById("ni-r").textContent=ni.toFixed(2);
-  document.getElementById("pi-bar").style.width=(pi*100)+"%";
-  document.getElementById("ni-bar").style.width=(ni*100)+"%";
-  document.getElementById("ta-bar").style.left=(t*100)+"%";
-  document.getElementById("ta-bar").setAttribute("data-l","τ="+t.toFixed(2));
-  var sel=tiers[2];
-  for(var i=0;i<tiers.length;i++){if(tiers[i].cap>=Math.max(ni,t)){sel=tiers[i];break}}
-  var b=document.getElementById("tier-band");
-  b.textContent=sel.n;
+ function upd(){var x=cx.value/100,l=lm.value/100,t=ta.value/100;
+  document.getElementById("cx-v").textContent=x.toFixed(2);document.getElementById("lm-v").textContent=l.toFixed(2);document.getElementById("ta-v").textContent=t.toFixed(2);
+  var pi=x,ni=Math.max(0,pi-.2);
+  document.getElementById("pi-r").textContent=pi.toFixed(2);document.getElementById("ni-r").textContent=ni.toFixed(2);
+  document.getElementById("pi-bar").style.width=(pi*100)+"%";document.getElementById("ni-bar").style.width=(ni*100)+"%";
+  document.getElementById("ta-bar").style.left=(t*100)+"%";document.getElementById("ta-bar").setAttribute("data-l","τ="+t.toFixed(2));
+  var sel=tiers[2];for(var i=0;i<3;i++){if(tiers[i].cap>=Math.max(ni,t)){sel=tiers[i];break}}
+  var b=document.getElementById("tier-band");b.textContent=sel.n;
   b.className="band "+(sel.n==="NANO"?"NOVEL":sel.n==="STANDARD"?"AMBIGUOUS":"COMMITTED");
-  grid.innerHTML=tiers.map(function(tier){
-   var isSel=tier.n===sel.n;
-   var reward=(tier.cap-l*tier.cost).toFixed(2);
-   return '<div class="tcard'+(isSel?' sel':'')+'"><div class="tn" style="color:'+tier.col+'">'+tier.n+'</div>'+
-    '<div class="tc">cap '+tier.cap.toFixed(2)+' · $'+tier.cost.toFixed(2)+'/1K</div>'+
-    '<div class="tp">reward '+reward+(isSel?' · ✓ routed':'')+'</div></div>';
-  }).join("");
+  grid.innerHTML=tiers.map(function(tier){var on=tier.n===sel.n;
+   return '<div class="tcard'+(on?" sel":"")+'"><div class="tn" style="color:'+tier.col+'">'+tier.n+'</div><div class="tc">cap '+tier.cap.toFixed(2)+' · $'+tier.cost.toFixed(2)+'/1K</div><div class="tp">reward '+(tier.cap-l*tier.cost).toFixed(2)+(on?' · ✓ routed':'')+'</div></div>'}).join("");
   document.getElementById("rw-r").textContent=(sel.cap-l*sel.cost).toFixed(2);
   document.getElementById("co-r").textContent="$"+sel.cost.toFixed(2);
-  document.getElementById("cb-r").textContent="−"+(sel.n==="NANO"?0.18:sel.n==="STANDARD"?0.08:0.02).toFixed(2);
- }
- [cx,lm,ta,tc].forEach(function(e){e.addEventListener("input",upd)});upd();
+  document.getElementById("cb-r").textContent="−"+(sel.n==="NANO"?.18:sel.n==="STANDARD"?.08:.02).toFixed(2)}
+ [cx,lm,ta].forEach(function(e){e.addEventListener("input",upd)});upd()})();
+
+/* ═══ SOVEREIGN SIMULATOR ═══ */
+(function(){var canvas=document.getElementById("sovCanvas");if(!canvas)return;
+ var s=fit("sovCanvas"),ctx=s.ctx,W=s.W,H=s.H;
+ var gateways=[
+  {id:"EU-FR",name:"Mistral-Large",jur:"EU",cost:.85,lat:145,carbon:.052,itar:false,x:0,y:0},
+  {id:"EU-DE",name:"Llama-3.1-405B",jur:"EU",cost:1,lat:168,carbon:.312,itar:false,x:0,y:0},
+  {id:"US-VA",name:"FedRAMP Cluster",jur:"US",cost:.75,lat:95,carbon:.38,itar:true,x:0,y:0},
+  {id:"US-OR",name:"Llama-3.1-70B",jur:"US",cost:.7,lat:110,carbon:.12,itar:false,x:0,y:0},
+  {id:"JP-TK",name:"Claude-Haiku",jur:"JP",cost:.9,lat:128,carbon:.49,itar:false,x:0,y:0},
+  {id:"SG",name:"PDPA Cluster",jur:"SG",cost:.8,lat:140,carbon:.28,itar:false,x:0,y:0}];
+ var profiles={"eu-banking":{label:"EU banking record with PII",regs:["eu"],note:"PII detected · EU AI Act Title III applies"},
+  "defense":{label:"Defense avionics specification",regs:["itar"],note:"ITAR-controlled · FedRAMP clearance required"},
+  "health":{label:"US healthcare diagnostic record",regs:["itar"],note:"PHI detected · US-only processing required"},
+  "apac":{label:"APAC personal data payload",regs:["pdpa"],note:"APAC residency · Singapore PDPA applies"},
+  "public":{label:"Unrestricted public web scraping",regs:[],note:"No PII · no jurisdictional constraint"}};
+ var input={x:50,y:H/2};var attempts=0;var anim=null;var hovered=null;
+ function layout(){var left=180,right=W-40;gateways.forEach(function(g,i){g.x=left+(right-left)*(i/(gateways.length-1));g.y=H/2+(i%2===0?-52:52)});input.y=H/2}
+ layout();
+ function activeRegs(){var set={};document.querySelectorAll('.checkrow input[type=checkbox]').forEach(function(cb){if(cb.checked)set[cb.dataset.reg]=true});return set}
+ function allowed(g,R){if(R.eu&&g.jur!=="EU")return false;if(R.fr&&g.id!=="EU-FR")return false;if(R.itar&&!(g.jur==="US"&&g.itar))return false;if(R.pdpa&&g.jur!=="SG")return false;return true}
+ function constraintLabel(R){var p=[];if(R.eu)p.push("EU ONLY");if(R.fr)p.push("EU-FR ONLY");if(R.itar)p.push("US-VA ITAR");if(R.pdpa)p.push("SG ONLY");return p.length?p.join(" ∩ "):"UNRESTRICTED"}
+ function score(g){var wl=Number(document.getElementById("lat").value)/100;var wc=Number(document.getElementById("carb").value)/100;var wf=Number(document.getElementById("cost").value)/100;
+  return (1-wf)*g.cost+wl*(g.lat/250)+wc*(g.carbon*2)}
+ function drawBase(){ctx.clearRect(0,0,W,H);var ink=cssv("--ink"),mut=cssv("--ink3"),blue=cssv("--link"),rule=cssv("--rule2");
+  ctx.strokeStyle=hexa(blue,.22);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(140,H/2);ctx.lineTo(W-30,H/2);ctx.stroke();
+  ctx.fillStyle=cssv("--card");ctx.strokeStyle=blue;ctx.lineWidth=1.5;ctx.fillRect(input.x-16,input.y-16,32,32);ctx.strokeRect(input.x-16,input.y-16,32,32);
+  ctx.fillStyle=blue;ctx.font='700 8px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText("REQ",input.x,input.y+3);
+  ctx.fillStyle=mut;ctx.font='500 8px "JetBrains Mono",monospace';ctx.fillText("INGRESS",input.x,input.y+32);
+  gateways.forEach(function(g){var isH=hovered===g.id;ctx.fillStyle=isH?hexa(blue,.12):cssv("--card");ctx.strokeStyle=isH?blue:rule;ctx.lineWidth=isH?1.8:1.2;
+   var bw=76,bh=40;ctx.fillRect(g.x-bw/2,g.y-bh/2,bw,bh);ctx.strokeRect(g.x-bw/2,g.y-bh/2,bw,bh);
+   ctx.fillStyle=ink;ctx.font='700 10px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText(g.id,g.x,g.y-3);
+   ctx.fillStyle=mut;ctx.font='500 8px "JetBrains Mono",monospace';ctx.fillText(g.jur,g.x,g.y+11)})}
+ function arcTo(g,endT,color,dashed,lw){var sx=input.x+18,sy=input.y,ex=g.x,ey=g.y,cx2=(sx+ex)/2;
+  ctx.strokeStyle=color;ctx.lineWidth=lw||1.5;if(dashed)ctx.setLineDash([5,4]);else ctx.setLineDash([]);
+  ctx.beginPath();var t=endT===undefined?1:endT;
+  for(var i=0;i<=40;i++){var u=(i/40)*t;var px=(1-u)*(1-u)*sx+2*(1-u)*u*cx2+u*u*ex;var py=(1-u)*(1-u)*sy+2*(1-u)*u*sy+u*u*ey;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}
+  ctx.stroke();ctx.setLineDash([]);
+  if(endT!==undefined){var u2=t;return{x:(1-u2)*(1-u2)*sx+2*(1-u2)*u2*cx2+u2*u2*ex,y:(1-u2)*(1-u2)*sy+2*(1-u2)*u2*sy+u2*u2*ey}}return null}
+ function drawBlocked(g){var red=cssv("--alert");arcTo(g,1,hexa(red,.55),true,1.3);
+  var mx=(input.x+18+g.x)/2,my=(input.y+g.y)/2;ctx.strokeStyle=red;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(mx-6,my-6);ctx.lineTo(mx+6,my+6);ctx.moveTo(mx+6,my-6);ctx.lineTo(mx-6,my+6);ctx.stroke();
+  ctx.fillStyle=red;ctx.font='700 7px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText("BLOCKED",mx,my-12)}
+ function animateRoute(choice,blocked,done){if(anim)cancelAnimationFrame(anim);drawBase();blocked.forEach(drawBlocked);
+  if(!choice){if(done)done();return}
+  var start=performance.now(),dur=1400,blue=cssv("--link");
+  function step2(now){var t=Math.min(1,(now-start)/dur);var ease=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+   drawBase();blocked.forEach(drawBlocked);
+   var p=arcTo(choice,ease,hexa(blue,.7),false,2);
+   if(p){ctx.fillStyle=blue;ctx.beginPath();ctx.arc(p.x,p.y,4,0,7);ctx.fill();ctx.strokeStyle=hexa(blue,.3);ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x,p.y,9,0,7);ctx.stroke()}
+   if(t<1)anim=requestAnimationFrame(step2);
+   else{ctx.strokeStyle=hexa(blue,.4);ctx.lineWidth=1;ctx.beginPath();ctx.arc(choice.x,choice.y,30,0,7);ctx.stroke();anim=null;if(done)done()}}
+  anim=requestAnimationFrame(step2)}
+ function runRoute(){var R=activeRegs();var profile=document.getElementById("sov-profile").value;var meta=profiles[profile];
+  var merged={};meta.regs.forEach(function(r){merged[r]=true});Object.keys(R).forEach(function(r){merged[r]=true});R=merged;
+  document.getElementById("sov-constraint").textContent=constraintLabel(R);
+  attempts++;document.getElementById("sov-attempts").textContent=attempts;
+  var allowedList=gateways.filter(function(g){return allowed(g,R)});
+  var unconstrained=gateways.slice().sort(function(a,b){return score(a)-score(b)})[0];
+  var blocked=gateways.filter(function(g){return !allowed(g,R)});
+  var band=document.getElementById("sov-band"),line=document.getElementById("sov-result-line"),alertBox=document.getElementById("sov-alert");
+  alertBox.classList.remove("show","ok");
+  if(allowedList.length===0){band.textContent="HELD · NO COMPLIANT GATEWAY";band.className="band BLOCKED";
+   line.innerHTML="<b>"+meta.label+"</b> · constraint <b>"+constraintLabel(R)+"</b> has no available gateway. Request held at ingress; no egress committed.";
+   alertBox.className="alert-box show";alertBox.innerHTML="⊘ POLICY CONFLICT — conflicting constraints resolve to an empty gateway set. Request held, not redirected.";
+   drawBase();blocked.forEach(drawBlocked);
+   if(window.pushFeed)window.pushFeed({msg:"<b>req-"+hexStr(4)+"</b> → HELD · no compliant gateway · "+constraintLabel(R),status:"held",label:"HELD"});return}
+  var choice=allowedList.slice().sort(function(a,b){return score(a)-score(b)})[0];
+  var breach=unconstrained.id!==choice.id&&!allowed(unconstrained,R);
+  document.getElementById("btn-route").disabled=true;
+  animateRoute(choice,blocked,function(){document.getElementById("btn-route").disabled=false;
+   band.textContent="COMMITTED · "+choice.id;band.className="band AMBIGUOUS";
+   line.innerHTML="<b>"+meta.label+"</b> → <span class='dest'>"+choice.id+"</span> · "+choice.name+" · cost $"+choice.cost.toFixed(2)+" · "+choice.lat+"ms · "+(choice.carbon*1000).toFixed(0)+" gCO₂/kWh";
+   if(breach){alertBox.className="alert-box show";
+    alertBox.innerHTML="⊘ BOUNDARY_BREACH_PREVENTED — cheapest unconstrained node <b>"+unconstrained.id+"</b> violates <b>"+constraintLabel(R)+"</b>. Egress blocked; redirected to <b>"+choice.id+"</b>.";
+    if(window.pushFeed)window.pushFeed({msg:"<b>req-"+hexStr(4)+"</b> → "+unconstrained.id+" → <b>BLOCKED</b> · "+constraintLabel(R)+" · redirected "+choice.id,status:"blocked",label:"PREVENTED"});}
+   else{alertBox.className="alert-box show ok";
+    alertBox.innerHTML="✓ SOVEREIGNTY SATISFIED — selected gateway satisfies <b>"+constraintLabel(R)+"</b>. Commitment written to APX-HL-EGRESS.";
+    if(window.pushFeed)window.pushFeed({msg:"<b>req-"+hexStr(4)+"</b> → "+choice.id+" · "+choice.name+" · attested",status:"ok",label:"COMMITTED"});}})}
+ document.getElementById("btn-route").addEventListener("click",runRoute);
+ document.querySelectorAll(".checkrow").forEach(function(row){var cb=row.querySelector("input");
+  cb.addEventListener("change",function(){row.classList.toggle("on",cb.checked);
+   document.getElementById("sov-band").textContent="CONSTRAINTS CHANGED";document.getElementById("sov-band").className="band IDLE";
+   document.getElementById("sov-alert").classList.remove("show");
+   document.getElementById("sov-constraint").textContent=constraintLabel(activeRegs());drawBase()})});
+ document.getElementById("sov-profile").addEventListener("change",function(){var meta=profiles[this.value];
+  document.querySelectorAll(".checkrow").forEach(function(row){var cb=row.querySelector("input");cb.checked=meta.regs.indexOf(cb.dataset.reg)>=0;row.classList.toggle("on",cb.checked)});
+  document.getElementById("sov-constraint").textContent=constraintLabel(activeRegs());
+  document.getElementById("sov-result-line").innerHTML="<b>"+meta.label+"</b> · "+meta.note+". Click <b>Route Request</b> to evaluate.";
+  document.getElementById("sov-band").textContent="PROFILE LOADED";document.getElementById("sov-band").className="band IDLE";
+  document.getElementById("sov-alert").classList.remove("show");drawBase()});
+ canvas.addEventListener("mousemove",function(e){var r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;var found=null;
+  gateways.forEach(function(g){if(Math.abs(x-g.x)<38&&Math.abs(y-g.y)<22)found=g});
+  if(found){hovered=found.id;drawBase();canvas.style.cursor="pointer";
+   var ins=document.getElementById("sovInspector");ins.classList.add("open");
+   document.getElementById("si-name").textContent=found.id+" · "+found.jur;
+   var R=activeRegs(),ok=allowed(found,R);
+   document.getElementById("si-body").innerHTML='<div class="ir"><span>model</span><b>'+found.name+'</b></div><div class="ir"><span>cost / 1K</span><b>$'+found.cost.toFixed(2)+'</b></div><div class="ir"><span>latency</span><b>'+found.lat+'ms</b></div><div class="ir"><span>carbon</span><b>'+(found.carbon*1000).toFixed(0)+' gCO₂</b></div><div class="ir"><span>J(n)</span><b>'+score(found).toFixed(3)+'</b></div><div class="ir"><span>constraint</span><b style="color:'+(ok?'var(--ok)':'var(--alert)')+'">'+(ok?'PERMITTED':'BLOCKED')+'</b></div>';}
+  else if(hovered){hovered=null;drawBase();canvas.style.cursor="default";document.getElementById("sovInspector").classList.remove("open")}});
+ canvas.addEventListener("mouseleave",function(){hovered=null;drawBase();document.getElementById("sovInspector").classList.remove("open")});
+ document.getElementById("si-close").addEventListener("click",function(){document.getElementById("sovInspector").classList.remove("open")});
+ window.addEventListener("resize",function(){var n=fit("sovCanvas");if(n){W=n.W;H=n.H;ctx=n.ctx;input.y=H/2;layout();drawBase()}});
+ drawBase();document.getElementById("sov-constraint").textContent=constraintLabel(activeRegs());
 })();
 
-/* SHARDING VIZ */
-(function(){
- var svg=document.getElementById("shardSvg");if(!svg)return;
- var NS="http://www.w3.org/2000/svg";
- var W=1000,H=320;
- var center={x:W/2,y:H/2};
- var providers=[
-  {x:180,y:70, label:"PROVIDER α · us-east", col:"var(--um-green)"},
-  {x:820,y:70, label:"PROVIDER β · eu-west", col:"var(--um-blue)"},
-  {x:W/2,y:H-40,label:"PROVIDER γ · apac",   col:"var(--um-orange)"}
- ];
- var sharded=false, anim=null, progress=0;
- function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
- function hexa(h,al){h=h.trim();if(h[0]!=="#")return h;var s=h.slice(1);if(s.length===3)s=s.split("").map(function(c){return c+c}).join("");
-  return "rgba("+parseInt(s.slice(0,2),16)+","+parseInt(s.slice(2,4),16)+","+parseInt(s.slice(4,6),16)+","+al+")"}
- function render(){
-  var blue=cssv("--um-blue"),green=cssv("--um-green"),orange=cssv("--um-orange"),frame=cssv("--um-frame"),ink=cssv("--ink");
-  while(svg.firstChild)svg.removeChild(svg.firstChild);
-  var t=progress, tt=t*t*(3-2*t); // smoothstep
-  // connection lines center→providers
-  providers.forEach(function(p,i){
-   var l=document.createElementNS(NS,"line");
-   l.setAttribute("x1",center.x);l.setAttribute("y1",center.y);
-   l.setAttribute("x2",p.x);l.setAttribute("y2",p.y);
-   l.setAttribute("stroke",hexa(frame,.3));l.setAttribute("stroke-width","1");
-   l.setAttribute("stroke-dasharray","4 4");
-   svg.appendChild(l);
-  });
-  // center prompt node
-  var core=document.createElementNS(NS,"g");
-  var coreScale=1-tt*0.6;
-  var ring=document.createElementNS(NS,"circle");
-  ring.setAttribute("cx",center.x);ring.setAttribute("cy",center.y);ring.setAttribute("r",26*coreScale+6);
-  ring.setAttribute("fill","none");ring.setAttribute("stroke",hexa(blue,.35));ring.setAttribute("stroke-width","1.5");
-  core.appendChild(ring);
-  var coreRect=document.createElementNS(NS,"rect");
-  var cs=40*coreScale;
-  coreRect.setAttribute("x",center.x-cs/2);coreRect.setAttribute("y",center.y-cs/2);
-  coreRect.setAttribute("width",cs);coreRect.setAttribute("height",cs);coreRect.setAttribute("rx",6);
-  coreRect.setAttribute("fill",hexa(blue,.12));coreRect.setAttribute("stroke",blue);coreRect.setAttribute("stroke-width","2");
-  core.appendChild(coreRect);
-  var coreTxt=document.createElementNS(NS,"text");
-  coreTxt.setAttribute("x",center.x);coreTxt.setAttribute("y",center.y+4);
-  coreTxt.setAttribute("text-anchor","middle");coreTxt.setAttribute("font-family","JetBrains Mono, monospace");
-  coreTxt.setAttribute("font-size","9");coreTxt.setAttribute("fill",ink);coreTxt.setAttribute("font-weight","700");
-  coreTxt.textContent=tt>0.5?"KEY":"PROMPT";
-  core.appendChild(coreTxt);
-  svg.appendChild(core);
-  // providers + shards
-  providers.forEach(function(p,i){
-   // provider node
-   var pr=document.createElementNS(NS,"g");
-   var pc=document.createElementNS(NS,"circle");
-   pc.setAttribute("cx",p.x);pc.setAttribute("cy",p.y);pc.setAttribute("r",20);
-   pc.setAttribute("fill",hexa(p.col.startsWith("var")?cssv(p.col.slice(4,-1)):p.col,.14));
-   pc.setAttribute("stroke",cssv(p.col.slice(4,-1)));pc.setAttribute("stroke-width","2");
-   pr.appendChild(pc);
-   var pl=document.createElementNS(NS,"text");
-   pl.setAttribute("x",p.x);pl.setAttribute("y",p.y+(p.y<H/2?-30:36));
-   pl.setAttribute("text-anchor","middle");pl.setAttribute("font-family","JetBrains Mono, monospace");
-   pl.setAttribute("font-size","10");pl.setAttribute("fill",cssv("--ink3"));pl.setAttribute("letter-spacing","1");
-   pl.textContent=p.label;
-   pr.appendChild(pl);
-   svg.appendChild(pr);
-   // shard traveling from center to provider
-   var sx=center.x+(p.x-center.x)*tt;
-   var sy=center.y+(p.y-center.y)*tt;
-   var shard=document.createElementNS(NS,"rect");
-   var ss=16;
-   shard.setAttribute("x",sx-ss/2);shard.setAttribute("y",sy-ss/2);
-   shard.setAttribute("width",ss);shard.setAttribute("height",ss);shard.setAttribute("rx",3);
-   shard.setAttribute("fill",cssv(p.col.slice(4,-1)));
-   shard.setAttribute("opacity",tt>0.05?0.95:0);
-   shard.setAttribute("transform","rotate("+tt*180+" "+sx+" "+sy+")");
-   svg.appendChild(shard);
-  });
-  document.getElementById("sh-count").textContent=Math.round(tt*3)+"/3";
-  document.getElementById("sh-leak").textContent=tt>0.5?"0":"1";
-  var st=document.getElementById("sh-status");
-  if(tt<0.05){st.className="acc";st.textContent="● PRE-SHARD · prompt whole"}
-  else if(tt<0.95){st.className="acc";st.textContent="◐ SHARDING · distributing shares"}
-  else{st.className="ok";st.textContent="✓ SHARDED · 3-of-3 distributed · no complete context"}
- }
- function animateTo(target){
-  if(anim)cancelAnimationFrame(anim);
-  function step(){
-   progress+=(target-progress)*0.08;
-   if(Math.abs(progress-target)<0.01){progress=target;render();anim=null;
-    document.getElementById("sh-shard").disabled=(target===1);
-    document.getElementById("sh-recon").disabled=(target===0);
-    return}
-   render();anim=requestAnimationFrame(step);
-  }
-  step();
- }
- document.getElementById("sh-shard").addEventListener("click",function(){animateTo(1)});
- document.getElementById("sh-recon").addEventListener("click",function(){animateTo(0)});
- new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
- render();
+/* ═══ INTERVAL HYPERGRAPH ═══ */
+(function(){var c=document.getElementById("intervalCanvas");if(!c)return;
+ var s=fit("intervalCanvas"),ctx=s.ctx,W=s.W,H=s.H;
+ var jurs=["EU-FR","EU-DE","US-VA","US-OR","JP-TK","SG"];var verts=[],edges=[];var hovered=null;
+ function init(){verts=[];edges=[];
+  for(var i=0;i<jurs.length;i++)verts.push({x:70+(W-140)/(jurs.length-1)*i,y:H/2+20,l:jurs[i],r:7,idx:i});
+  for(var i=0;i<verts.length-1;i++)for(var len=2;len<=3&&i+len<=verts.length;len++)
+   edges.push({v:verts.slice(i,i+len),w:.3+Math.random()*.7,cost:.3+Math.random()*.7,lat:.2+Math.random()*.6,carb:Math.random()*.5,ph:Math.random()*6.28})}
+ init();
+ function draw(){ctx.clearRect(0,0,W,H);var blue=cssv("--link"),ink=cssv("--ink"),mut=cssv("--ink3");var T=Date.now()*.001;
+  ctx.strokeStyle=hexa(blue,.3);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(40,H/2+20);ctx.lineTo(W-40,H/2+20);ctx.stroke();
+  ctx.fillStyle=mut;ctx.font='500 8px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText("SOVEREIGNTY AXIS",W/2,H-16);
+  edges.forEach(function(e){var fi=e.v[0],la=e.v[e.v.length-1];var isH=hovered===e;var pl=(Math.sin(T*1.2+e.ph)+1)/2;
+   var ry=H/2+20-14-e.w*16,rh=28+e.w*16;
+   ctx.fillStyle=hexa(blue,isH?.2:.05+e.w*.07+pl*.03);ctx.fillRect(fi.x,ry,la.x-fi.x,rh);
+   ctx.strokeStyle=hexa(blue,isH?.9:.3+pl*.2);ctx.lineWidth=isH?2:1;ctx.strokeRect(fi.x,ry,la.x-fi.x,rh);
+   ctx.fillStyle=isH?ink:hexa(blue,.85);ctx.font=(isH?'700 ':'600 ')+'9px "JetBrains Mono",monospace';ctx.textAlign="center";
+   ctx.fillText("J="+e.w.toFixed(2),(fi.x+la.x)/2,ry-5);
+   e.v.forEach(function(v){ctx.fillStyle=hexa(blue,.5);ctx.fillRect(v.x-1,ry,2,rh)})});
+  verts.forEach(function(v){ctx.fillStyle=blue;ctx.beginPath();ctx.arc(v.x,v.y,v.r,0,7);ctx.fill();
+   ctx.fillStyle=ink;ctx.font='700 10px "JetBrains Mono",monospace';ctx.textAlign="center";ctx.fillText(v.l,v.x,v.y+26)});
+  requestAnimationFrame(draw)}
+ c.addEventListener("mousemove",function(ev){var r=c.getBoundingClientRect(),x=ev.clientX-r.left,y=ev.clientY-r.top;var found=null;
+  edges.forEach(function(e){var fi=e.v[0],la=e.v[e.v.length-1];var ry=H/2+20-14-e.w*16,rh=28+e.w*16;
+   if(x>=fi.x&&x<=la.x&&y>=ry&&y<=ry+rh)found=e});
+  if(found!==hovered){hovered=found;var ins=document.getElementById("intInspector");
+   if(found){c.style.cursor="crosshair";ins.classList.add("open");
+    document.getElementById("ii-name").textContent=found.v[0].l+" → "+found.v[found.v.length-1].l;
+    document.getElementById("ii-body").innerHTML='<div class="ir"><span>vertices</span><b>'+found.v.length+'</b></div><div class="ir"><span>Cost(n)</span><b>'+found.cost.toFixed(3)+'</b></div><div class="ir"><span>Latency(n)</span><b>'+found.lat.toFixed(3)+'</b></div><div class="ir"><span>Carbon(n)</span><b>'+found.carb.toFixed(3)+'</b></div><div class="ir"><span>Ω_geo</span><b style="color:var(--ok)">0 · satisfied</b></div><div class="ir"><span>J(n)</span><b>'+found.w.toFixed(3)+'</b></div>';}
+   else{c.style.cursor="default";ins.classList.remove("open")}}});
+ c.addEventListener("mouseleave",function(){hovered=null;document.getElementById("intInspector").classList.remove("open")});
+ document.getElementById("ii-close").addEventListener("click",function(){document.getElementById("intInspector").classList.remove("open")});
+ window.addEventListener("resize",function(){var n=fit("intervalCanvas");if(n){W=n.W;H=n.H;ctx=n.ctx;init()}});
+ draw();
 })();
 
-/* CARBON-COST MATRIX */
-(function(){
- var slider=document.getElementById("ci-slider");
- var regions=[
-  {id:"us-east",name:"US-EAST DC",type:"STANDARD",edge:false,cost:.80,carbon:.45},
-  {id:"eu-west",name:"EU-WEST DC",type:"STANDARD",edge:false,cost:1.00,carbon:.32},
-  {id:"apac",name:"APAC DC",type:"STANDARD",edge:false,cost:.70,carbon:.62},
-  {id:"nordic",name:"NORDIC HYDRO",type:"KAGENTI EDGE",edge:true,cost:1.15,carbon:.04},
-  {id:"pnw",name:"PACIFIC NW",type:"KAGENTI EDGE",edge:true,cost:1.00,carbon:.08},
-  {id:"iberia",name:"IBERIA SOLAR",type:"KAGENTI EDGE",edge:true,cost:.92,carbon:.11}
- ];
- var stack=document.getElementById("trafficStack"),grid=document.getElementById("regionGrid"),co=document.getElementById("carbon-callout");
- function render(){
-  var g=Number(slider.value)/400;
-  document.getElementById("ci-v").textContent=slider.value;
-  var scored=regions.map(function(r){var s=r.cost*(1-g*.35)+r.carbon*g*2.2;return Object.assign({},r,{score:s})});
-  var total=scored.reduce(function(s,r){return s+Math.exp(-r.score*1.4)},0);
-  var alloc=scored.map(function(r){return Object.assign({},r,{share:Math.exp(-r.score*1.4)/total})});
-  var edgeTotal=alloc.filter(function(r){return r.edge}).reduce(function(s,r){return s+r.share},0);
-  var stdTotal=1-edgeTotal;
-  var steering=edgeTotal>stdTotal;
-  stack.innerHTML='<div class="tseg" style="width:'+(stdTotal*100)+'%;background:linear-gradient(90deg,#bd6208,#8a4a06)">'+(stdTotal>0.12?'STANDARD '+(stdTotal*100).toFixed(0)+'%':'')+'</div>'+
-   '<div class="tseg" style="width:'+(edgeTotal*100)+'%;background:linear-gradient(90deg,#3f7d4e,#5fbf78)">'+(edgeTotal>0.12?'KAGENTI EDGE '+(edgeTotal*100).toFixed(0)+'%':'')+'</div>';
-  grid.innerHTML=alloc.map(function(r){
-   var hot=r.share>0.28;
-   return '<div class="rcard'+(r.edge?' edge':'')+(hot?' hot':'')+'">'+
-    '<div class="rn">'+r.name+'</div><div class="rt'+(r.edge?' edge':'')+'">'+r.type+'</div>'+
-    '<div class="rrow"><span>cost $'+r.cost.toFixed(2)+'</span><span>'+r.carbon.toFixed(2)+' gCO₂</span></div>'+
-    '<div class="rrow"><span style="color:'+(hot?'var(--acc)':'var(--ink3)')+'">'+(r.share*100).toFixed(1)+'% traffic</span>'+(hot?'<span style="color:var(--acc)">✓ ROUTED</span>':'')+'</div>'+
-    '<div class="sharebar"><div class="sharefill" style="width:'+(r.share*100)+'%;background:'+(r.edge?'var(--um-green)':'var(--um-orange)')+'"></div></div></div>';
-  }).join("");
-  if(steering){co.innerHTML='<span class="packetdot"></span>STEERING ACTIVE → <b>'+(edgeTotal*100).toFixed(0)+'%</b> of elastic traffic on low-carbon Kagenti edge nodes. ENV_IMPACT meter: <b style="color:var(--ok)">−'+(edgeTotal*0.42).toFixed(2)+' kg CO₂e/h</b>. SLO preserved via possibility-floor gating.'}
-  else{co.innerHTML='<b>Cost-dominant regime</b> → <b>'+(stdTotal*100).toFixed(0)+'%</b> on standard compute. Raise grid intensity γ to trigger carbon-aware steering toward Kagenti edge.'}
- }
- slider.addEventListener("input",render);render();
-})();
-
-/* EGRESS */
-(function(){
- var body=document.getElementById("egressBody"),mode=document.getElementById("eg-mode");if(!body)return;
- var rows=[
-  {a:"AGENT_22",d:"pypi.org",i:"GET /simple/transformers/",h:"0x9d12…e7f4",cd:"CLEARED",s:"allow"},
-  {a:"AGENT_41",d:"hitl.internal",i:"POST /escalate/dissent",h:"0xc3e8…f4a1",cd:"CLEARED",s:"allow"},
-  {a:"AGENT_08",d:"api.openai.com",i:"POST /v1/embeddings",h:"0x8f43…d2c0",cd:"FLAGGED",s:"audit"},
-  {a:"AGENT_17",d:"huggingface.co",i:"GET /models/meta-llama",h:"—",cd:"NO COMMIT",s:"deny"},
-  {a:"AGENT_63",d:"huggingface.co",i:"GET /datasets/eval-traces",h:"—",cd:"NO COMMIT",s:"deny"},
-  {a:"AGENT_12",d:"security.team",i:"POST /whistleblower",h:"0xb7a9…e3f8",cd:"CLEARED",s:"allow"}
- ];
- function render(){
-  var m=mode.value;document.getElementById("eg-v").textContent=m;
-  body.innerHTML=rows.map(function(r){
-   var s=r.s,cd=r.cd;
-   if(m==="open"){s="allow";cd="ALLOWED"}
-   else if(m==="audit"&&r.s==="deny"){s="audit";cd="FLAGGED"}
-   return '<tr><td><b>'+r.a+'</b></td><td>'+r.d+'</td><td>'+r.i+'</td><td class="h">'+r.h+'</td><td><span class="st '+s+'">'+cd+'</span></td></tr>';
-  }).join("");
-  var note=document.getElementById("eg-note");
-  if(m==="strict")note.innerHTML="<b>strict mode:</b> uncommitted egress dropped at the Kagenti sandbox boundary. Attempts are attributable to a SVID principal, replayable, and slashable.";
-  else if(m==="audit")note.innerHTML="<b>audit mode:</b> traffic permitted but flagged. Useful for baseline collection; not recommended once agents hold tool-use capability.";
-  else note.innerHTML="<b>open mode:</b> legacy chatbot posture. No commitment check — the configuration under which a collective can reach external systems unchallenged.";
- }
- mode.addEventListener("change",render);render();
+/* ═══ EGRESS FEED ═══ */
+(function(){var feed=document.getElementById("feedBody");if(!feed)return;
+ var templates=[
+  {msg:'<b>req-{id}</b> → EU-DE · STANDARD · cap 0.72 · attested',status:'ok',label:'COMMITTED'},
+  {msg:'<b>req-{id}</b> → US-VA · FRONTIER · ITAR-cleared',status:'ok',label:'COMMITTED'},
+  {msg:'<b>req-{id}</b> → EU-FR → US-VA · Schrems II violation',status:'blocked',label:'PREVENTED'},
+  {msg:'<b>req-{id}</b> → SG · STANDARD · PDPA-compliant',status:'ok',label:'COMMITTED'},
+  {msg:'<b>req-{id}</b> → JP-TK · gateway unavailable',status:'held',label:'HELD'},
+  {msg:'<b>req-{id}</b> → EU-DE · NANO · cap 0.28',status:'ok',label:'COMMITTED'},
+  {msg:'<b>req-{id}</b> → US-VA → EU-FR · HIPAA violation',status:'blocked',label:'PREVENTED'},
+  {msg:'<b>req-{id}</b> → US-OR · STANDARD · carbon-optimal',status:'ok',label:'COMMITTED'}];
+ function push(item){var t=new Date().toISOString().slice(11,19);var d=document.createElement("div");d.className="feed-row";
+  d.innerHTML='<span class="time">'+t+'</span><span class="msg">'+item.msg+'</span><span class="status '+item.status+'">'+item.label+'</span>';
+  feed.insertBefore(d,feed.firstChild);while(feed.children.length>14)feed.removeChild(feed.lastChild)}
+ window.pushFeed=function(item){push(item)};
+ var i=0;function auto(){if(document.hidden)return;var tpl=templates[i%templates.length];
+  push({msg:tpl.msg.replace("{id}",hexStr(4)),status:tpl.status,label:tpl.label});i++}
+ for(var j=0;j<5;j++)auto();
+ setInterval(auto,3400);
 })();
 </script>
 </body>
